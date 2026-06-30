@@ -27,8 +27,8 @@ plt.rcParams['font.sans-serif'] = [
 ]
 plt.rcParams['axes.unicode_minus'] = False
 
-EXPERT_CN = ['长期专家', '短期专家', '统计专家']  # 与论文 ShortTerm/LongTerm/Statistic 对应（g0=Long, g1=Short, g2=Stat）
-EXPERT_EN_ORDER = ['LongTerm', 'ShortTerm', 'Statistic']  # baseline 顺序
+EXPERT_CN = ['短期专家', '长期专家', '分布偏移专家']
+EXPERT_EN_ORDER = ['ShortTerm', 'LongTerm', 'DistributionShift']
 
 
 def _load_model(checkpoint_path, device):
@@ -45,6 +45,9 @@ def _load_model(checkpoint_path, device):
         ablation_mode=ablation,
         use_scene_gating=cfg.get('use_scene_gating', True),
         enhanced_statistic=cfg.get('enhanced_statistic', True),
+        statistic_feature_set=cfg.get('statistic_feature_set', 'robust'),
+        use_regime_routing=cfg.get('use_regime_routing', False),
+        regime_dim=cfg.get('regime_dim', 16),
         scene_dim=cfg.get('scene_dim', SCENE_DIM),
     ).to(device)
     state = ckpt['model_state_dict']
@@ -210,6 +213,57 @@ def plot_stl_gate(gates, dates, merged_df, target_col, out_path, period=7):
     print(f'[OK] 已保存: {out_path}')
 
 
+def plot_volatility_short_gate(gates, dates, merged_df, target_col, out_path):
+    """图：局部波动率与短期专家权重关系"""
+    if gates.shape[1] < 1 or not dates:
+        return {}
+
+    df = merged_df[['time', target_col]].copy()
+    df['time'] = pd.to_datetime(df['time'])
+    df = df.sort_values('time').reset_index(drop=True)
+    y = df[target_col].astype(float)
+    pct_abs = y.pct_change().abs().replace([np.inf, -np.inf], np.nan)
+    df['volatility'] = pct_abs.rolling(7, min_periods=2).mean()
+
+    gate_df = pd.DataFrame({
+        'time': pd.to_datetime(dates),
+        'short_weight': gates[:, 0],
+    })
+    aligned = pd.merge(gate_df, df[['time', 'volatility']], on='time', how='left').dropna()
+    if len(aligned) < 3:
+        return {}
+
+    corr, p_value = stats.pearsonr(aligned['volatility'].values, aligned['short_weight'].values)
+
+    fig, ax = plt.subplots(figsize=(6.5, 4.5))
+    ax.scatter(aligned['volatility'], aligned['short_weight'], s=28, alpha=0.72, color='#4C72B0')
+    z = np.polyfit(aligned['volatility'].values, aligned['short_weight'].values, 1)
+    xs = np.linspace(aligned['volatility'].min(), aligned['volatility'].max(), 100)
+    ax.plot(xs, z[0] * xs + z[1], color='#C44E52', lw=1.6)
+    ax.set_xlabel('滚动波动率')
+    ax.set_ylabel('短期专家门控权重')
+    ax.set_title('局部波动率与短期专家激活关系', fontsize=13)
+    ax.grid(alpha=0.3)
+    ax.text(
+        0.02, 0.96, f'r={corr:.3f}, p={p_value:.2e}',
+        transform=ax.transAxes, ha='left', va='top',
+        bbox={'boxstyle': 'round,pad=0.3', 'facecolor': 'white', 'alpha': 0.8, 'edgecolor': '#BBBBBB'},
+    )
+    plt.tight_layout()
+    fig.savefig(out_path, dpi=200, bbox_inches='tight')
+    plt.close(fig)
+    print(f'[OK] 已保存: {out_path}')
+
+    return {
+        'target_col': target_col,
+        'n': int(len(aligned)),
+        'pearson_r': float(corr),
+        'p_value': float(p_value),
+        'short_weight_mean': float(aligned['short_weight'].mean()),
+        'volatility_mean': float(aligned['volatility'].mean()),
+    }
+
+
 def ttest_holiday_residual(gates, scenes):
     """节假日 vs 工作日 残差专家权重 t 检验"""
     if gates.shape[1] < 3:
@@ -260,11 +314,15 @@ def main():
     target_col = args.target_col or dataset_info['target_cols'][0]
     merged_df = dataset_info['merged_df']
     plot_stl_gate(gates, dates, merged_df, target_col, str(out_dir / '图_STL分解与门控权重对照.png'))
+    vol_stats = plot_volatility_short_gate(
+        gates, dates, merged_df, target_col,
+        out_dir / '图_波动率与短期专家权重关系.png',
+    )
     
     tt = ttest_holiday_residual(gates, scenes)
     stats_path = out_dir / '门控统计检验.json'
     with open(stats_path, 'w', encoding='utf-8') as f:
-        json.dump(tt or {}, f, ensure_ascii=False, indent=2)
+        json.dump({'holiday_distribution_shift_test': tt or {}, 'volatility_short_gate': vol_stats}, f, ensure_ascii=False, indent=2)
     if tt:
         print(f"节假日残差专家权重均值={tt['holiday_mean']:.4f}, "
               f"工作日={tt['weekday_mean']:.4f}, p={tt['p_value']:.4e}")

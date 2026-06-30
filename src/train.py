@@ -486,6 +486,15 @@ def main():
                         help='增强残差专家统计特征（默认开启）')
     parser.add_argument('--no_enhanced_statistic', dest='enhanced_statistic', action='store_false',
                         help='关闭增强统计（消融 Table 6）')
+    parser.add_argument('--statistic_feature_set', type=str, default='robust',
+                        choices=['basic', 'quantile', 'robust'],
+                        help='统计专家特征集合: basic=mean/std/max, quantile=加入分位数, robust=加入鲁棒分布偏移特征')
+    parser.add_argument('--use_regime_routing', action='store_true', default=True,
+                        help='启用Regime-aware Mixture Routing（默认开启）')
+    parser.add_argument('--no_regime_routing', dest='use_regime_routing', action='store_false',
+                        help='关闭Regime-aware routing（消融）')
+    parser.add_argument('--regime_dim', type=int, default=16,
+                        help='regime embedding维度')
     parser.add_argument('--balance_mode', type=str, default='entropy', choices=['entropy', 'variance'],
                         help='负载均衡: entropy(熵正则) 或 variance(方差，旧版)')
     parser.add_argument('--snapshot_every', type=int, default=5,
@@ -605,6 +614,9 @@ def main():
             ablation_mode=args.ablation_mode,
             use_scene_gating=args.use_scene_gating,
             enhanced_statistic=args.enhanced_statistic,
+            statistic_feature_set=args.statistic_feature_set,
+            use_regime_routing=args.use_regime_routing,
+            regime_dim=args.regime_dim,
             scene_dim=dataset_info.get('scene_dim', 8),
         )
         
@@ -933,6 +945,9 @@ def main():
                     'ablation_mode': args.ablation_mode,
                     'use_scene_gating': args.use_scene_gating,
                     'enhanced_statistic': args.enhanced_statistic,
+                    'statistic_feature_set': args.statistic_feature_set,
+                    'use_regime_routing': args.use_regime_routing,
+                    'regime_dim': args.regime_dim,
                     'balance_mode': args.balance_mode,
                     'scene_dim': dataset_info.get('scene_dim', 0),
                 },
@@ -1044,4 +1059,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

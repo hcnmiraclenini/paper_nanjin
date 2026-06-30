@@ -170,6 +170,9 @@ def main():
         ablation_mode=ablation_mode,
         use_scene_gating=config.get('use_scene_gating', False),
         enhanced_statistic=config.get('enhanced_statistic', True),
+        statistic_feature_set=config.get('statistic_feature_set', 'robust'),
+        use_regime_routing=config.get('use_regime_routing', False),
+        regime_dim=config.get('regime_dim', 16),
         scene_dim=config.get('scene_dim', 0),
     ).to(device)
     
@@ -280,4 +283,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

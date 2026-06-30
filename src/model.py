@@ -222,18 +222,28 @@ class LongTermExpert(nn.Module):
 
 
 class StatisticExpert(nn.Module):
-    """残差/分布专家（Residual Expert）：MLP 处理目标变量分布统计特征"""
+    """鲁棒分布偏移专家：MLP 处理窗口级分布变化特征"""
     def __init__(self, input_dim, n_targets=20, hidden_dim=128, output_dim=None, dropout=0.2,
-                 enhanced_stats=True):
+                 enhanced_stats=True, feature_set='robust'):
         super().__init__()
         self.input_dim = input_dim
         self.n_targets = n_targets
         self.hidden_dim = hidden_dim
         self.output_dim = output_dim
         self.enhanced_stats = enhanced_stats
+        self.feature_set = feature_set
         
-        # mean, std, max (+ skew, kurt, Q25, Q75 when enhanced)
-        stats_per_target = 7 if enhanced_stats else 3
+        if not enhanced_stats:
+            self.feature_set = 'basic'
+
+        stats_per_target = {
+            'basic': 3,       # mean, std, max
+            'quantile': 6,    # basic + q25, q50, q75
+            'robust': 10,     # quantile + robust_z, quantile_skew, volatility, peak-to-average
+        }.get(self.feature_set)
+        if stats_per_target is None:
+            raise ValueError(f"未知统计特征集合: {self.feature_set}")
+
         target_stats_dim = n_targets * stats_per_target
         self.target_stats_proj = nn.Sequential(
             nn.Linear(target_stats_dim, hidden_dim),
@@ -262,21 +272,36 @@ class StatisticExpert(nn.Module):
         # 目标变量统计特征
         target_features = x  # [B, T, n_targets]
         
-        target_mean = target_features.mean(dim=1)  # [B, n_targets]
-        target_std = target_features.std(dim=1).clamp_min(1e-6)   # [B, n_targets]
-        target_max = target_features.max(dim=1)[0]  # [B, n_targets]
-        
-        if self.enhanced_stats:
-            centered = target_features - target_mean.unsqueeze(1)
-            skew = (centered ** 3).mean(dim=1) / (target_std ** 3 + 1e-8)
-            kurt = (centered ** 4).mean(dim=1) / (target_std ** 4 + 1e-8)
-            q25 = torch.quantile(target_features, 0.25, dim=1)
-            q75 = torch.quantile(target_features, 0.75, dim=1)
-            target_stats = torch.cat(
-                [target_mean, target_std, target_max, skew, kurt, q25, q75], dim=1
-            )
-        else:
+        eps = 1e-6
+        target_mean = target_features.mean(dim=1)
+        target_std = target_features.std(dim=1).clamp_min(eps)
+        target_max = target_features.max(dim=1)[0]
+
+        if self.feature_set == 'basic':
             target_stats = torch.cat([target_mean, target_std, target_max], dim=1)
+        elif self.feature_set == 'quantile':
+            q25 = torch.quantile(target_features, 0.25, dim=1)
+            q50 = torch.quantile(target_features, 0.50, dim=1)
+            q75 = torch.quantile(target_features, 0.75, dim=1)
+            target_stats = torch.cat([target_mean, target_std, target_max, q25, q50, q75], dim=1)
+        else:
+            q25 = torch.quantile(target_features, 0.25, dim=1)
+            q50 = torch.quantile(target_features, 0.50, dim=1)
+            q75 = torch.quantile(target_features, 0.75, dim=1)
+            iqr = (q75 - q25).abs().clamp_min(eps)
+            robust_z = ((target_features[:, -1, :] - q50).abs() / iqr).clamp(max=20.0)
+            quantile_skew = ((q75 + q25 - 2.0 * q50) / iqr).clamp(min=-20.0, max=20.0)
+            diffs = target_features[:, 1:, :] - target_features[:, :-1, :]
+            volatility = (diffs.std(dim=1) / (target_mean.abs() + eps)).clamp(max=20.0)
+            peak_to_average = (target_max.abs() / (target_mean.abs() + eps)).clamp(max=20.0)
+            target_stats = torch.cat(
+                [
+                    target_mean, target_std, target_max,
+                    q25, q50, q75,
+                    robust_z, quantile_skew, volatility, peak_to_average,
+                ],
+                dim=1,
+            )
         
         target_encoded = self.target_stats_proj(target_stats)  # [B, hidden_dim]
         
@@ -289,16 +314,57 @@ class StatisticExpert(nn.Module):
         return output
 
 
+class RegimeEncoder(nn.Module):
+    """窗口级状态编码器：显式抽取非平稳 regime 并供门控路由使用"""
+    def __init__(self, hidden_dim=128, output_dim=16, dropout=0.2):
+        super().__init__()
+        self.output_dim = output_dim
+        self.encoder = nn.Sequential(
+            nn.Linear(4, hidden_dim // 2),
+            nn.GELU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim // 2, output_dim),
+            nn.GELU(),
+        )
+
+    @staticmethod
+    def regime_features(x):
+        eps = 1e-6
+        level = x.abs().mean(dim=(1, 2)).clamp_min(eps)
+        centered = x - x.mean(dim=1, keepdim=True)
+        volatility = centered.std(dim=(1, 2)) / level
+        trend_strength = (x[:, -1, :] - x[:, 0, :]).abs().mean(dim=1) / level
+        if x.size(1) > 2:
+            second_diff = x[:, 2:, :] - 2.0 * x[:, 1:-1, :] + x[:, :-2, :]
+            local_shift = second_diff.abs().mean(dim=(1, 2)) / level
+        else:
+            local_shift = torch.zeros_like(volatility)
+        q25 = torch.quantile(x, 0.25, dim=1)
+        q50 = torch.quantile(x, 0.50, dim=1)
+        q75 = torch.quantile(x, 0.75, dim=1)
+        iqr = (q75 - q25).abs().clamp_min(eps)
+        distribution_shift = ((x[:, -1, :] - q50).abs() / iqr).mean(dim=1)
+        feats = torch.stack(
+            [volatility, trend_strength, local_shift, distribution_shift],
+            dim=1,
+        )
+        return torch.nan_to_num(feats, nan=0.0, posinf=20.0, neginf=-20.0).clamp(-20.0, 20.0)
+
+    def forward(self, x):
+        return self.encoder(self.regime_features(x))
+
+
 class GatingNetwork(nn.Module):
     """场景感知门控网络：Flatten(历史序列) + 日历场景向量 c_t"""
-    def __init__(self, input_dim, lookback, num_experts, hidden_dim=128, dropout=0.2, scene_dim=0):
+    def __init__(self, input_dim, lookback, num_experts, hidden_dim=128, dropout=0.2, scene_dim=0, regime_dim=0):
         super().__init__()
         self.num_experts = num_experts
         self.input_dim = input_dim
         self.lookback = lookback
         self.scene_dim = scene_dim
+        self.regime_dim = regime_dim
         
-        gate_in_dim = lookback * input_dim + scene_dim
+        gate_in_dim = lookback * input_dim + scene_dim + regime_dim
         self.feature_extractor = nn.Sequential(
             nn.Linear(gate_in_dim, hidden_dim),
             nn.GELU(),
@@ -313,14 +379,18 @@ class GatingNetwork(nn.Module):
             nn.Linear(hidden_dim // 2, num_experts)
         )
     
-    def forward(self, x, scene_c=None):
-        """x: [B, T, D], scene_c: [B, scene_dim] -> weights, logits"""
+    def forward(self, x, scene_c=None, regime_z=None):
+        """x: [B, T, D], scene_c/regime_z: optional route conditions"""
         B, T, D = x.shape
         flat_input = x.reshape(B, -1)
         if self.scene_dim > 0:
             if scene_c is None:
                 scene_c = torch.zeros(B, self.scene_dim, device=x.device, dtype=x.dtype)
             flat_input = torch.cat([flat_input, scene_c], dim=-1)
+        if self.regime_dim > 0:
+            if regime_z is None:
+                regime_z = torch.zeros(B, self.regime_dim, device=x.device, dtype=x.dtype)
+            flat_input = torch.cat([flat_input, regime_z], dim=-1)
         
         features = self.feature_extractor(flat_input)
         logits = self.gating(features)  # [B, num_experts]
@@ -342,6 +412,9 @@ class MoENanjin(nn.Module):
         ablation_mode='baseline',
         use_scene_gating=True,
         enhanced_statistic=True,
+        statistic_feature_set='robust',
+        use_regime_routing=True,
+        regime_dim=16,
         scene_dim=8,
     ):
         super().__init__()
@@ -352,6 +425,9 @@ class MoENanjin(nn.Module):
         self.ablation_mode = ablation_mode
         self.use_scene_gating = use_scene_gating
         self.enhanced_statistic = enhanced_statistic
+        self.statistic_feature_set = statistic_feature_set
+        self.use_regime_routing = use_regime_routing
+        self.regime_dim = regime_dim if use_regime_routing else 0
         self.scene_dim = scene_dim if use_scene_gating else 0
         
         # 默认专家配置
@@ -374,9 +450,10 @@ class MoENanjin(nn.Module):
             expert_types.append('LongTerm')
             self.experts.append(StatisticExpert(
                 input_dim, n_targets=input_dim, output_dim=output_dim,
-                enhanced_stats=enhanced_statistic, **expert_config['statistic'], dropout=dropout
+                enhanced_stats=enhanced_statistic, feature_set=statistic_feature_set,
+                **expert_config['statistic'], dropout=dropout
             ))
-            expert_types.append('Residual')
+            expert_types.append('DistributionShift')
         elif ablation_mode == 'no_statistic':
             # 移除StatisticExpert：1×GRU + 1×Transformer = 2个专家
             self.experts.append(ShortTermExpert(input_dim, output_dim=output_dim, **expert_config['short_term'], dropout=dropout))
@@ -389,32 +466,37 @@ class MoENanjin(nn.Module):
             expert_types.append('ShortTerm')
             self.experts.append(StatisticExpert(
                 input_dim, n_targets=input_dim, output_dim=output_dim,
-                enhanced_stats=enhanced_statistic, **expert_config['statistic'], dropout=dropout
+                enhanced_stats=enhanced_statistic, feature_set=statistic_feature_set,
+                **expert_config['statistic'], dropout=dropout
             ))
-            expert_types.append('Residual')
+            expert_types.append('DistributionShift')
         elif ablation_mode == 'no_shortterm':
             # 移除ShortTermExpert：1×Transformer + 1×MLP = 2个专家
             self.experts.append(LongTermExpert(input_dim, output_dim=output_dim, **expert_config['long_term'], dropout=dropout))
             expert_types.append('LongTerm')
             self.experts.append(StatisticExpert(
                 input_dim, n_targets=input_dim, output_dim=output_dim,
-                enhanced_stats=enhanced_statistic, **expert_config['statistic'], dropout=dropout
+                enhanced_stats=enhanced_statistic, feature_set=statistic_feature_set,
+                **expert_config['statistic'], dropout=dropout
             ))
-            expert_types.append('Residual')
+            expert_types.append('DistributionShift')
         else:
             raise ValueError(f"未知的ablation_mode: {ablation_mode}. 支持的模式: 'baseline', 'no_statistic', 'no_longterm', 'no_shortterm'")
         
         # 门控网络：专家数量根据ablation_mode动态调整
         self.num_experts = len(self.experts)
+        self.regime_encoder = RegimeEncoder(hidden_dim, self.regime_dim, dropout) if self.use_regime_routing else None
         self.gating = GatingNetwork(
             input_dim, lookback, self.num_experts, hidden_dim, dropout,
-            scene_dim=self.scene_dim
+            scene_dim=self.scene_dim, regime_dim=self.regime_dim
         )
         
         # 打印专家配置信息
         print(f"\n[模型配置] 消融模式: {ablation_mode}")
         print(f"  专家数量: {self.num_experts}")
         print(f"  专家类型: {expert_types}")
+        print(f"  统计专家特征: {self.statistic_feature_set}")
+        print(f"  Regime-aware routing: {self.use_regime_routing}")
     
     def forward(self, x, scene_c=None):
         """
@@ -422,7 +504,8 @@ class MoENanjin(nn.Module):
             x: [B, T, F] 输入序列
             scene_c: [B, scene_dim] 日历场景向量（可选）
         """
-        gate_weights, gate_logits = self.gating(x, scene_c)
+        regime_z = self.regime_encoder(x) if self.regime_encoder is not None else None
+        gate_weights, gate_logits = self.gating(x, scene_c, regime_z)
         
         # 各专家处理
         expert_outputs = []
@@ -440,4 +523,3 @@ class MoENanjin(nn.Module):
             output = output + x[:, -1, :]
         
         return output, expert_outputs, gate_weights, gate_logits
-

@@ -5,10 +5,11 @@ source "$(dirname "$0")/_env.sh"
 
 LOG_DIR="../logs/paper_experiments"
 CKPT_BASE="../checkpoints/paper_experiments"
+DATA_DIR="${DATA_DIR:-/root/data3/huangchanni/data}"
 mkdir -p "$LOG_DIR" "$CKPT_BASE"
 
 # 与原文 baseline 一致的超参
-COMMON="--data_dir ../data --lookback 6 --horizon 1 --batch_size 64 \
+COMMON="--data_dir ${DATA_DIR} --lookback 6 --horizon 1 --batch_size 64 \
   --hidden_dim 512 --dropout 0.2 --num_epochs 300 --patience 50 \
   --learning_rate 0.001 --lambda_mape 0.5 --lambda_mae 1.0 --lambda_mse 0.5 \
   --lambda_balance 0.01 --lambda_range 0.1 --num_workers 8 --use_both"
@@ -21,42 +22,50 @@ run_train() {
     local save_dir="${CKPT_BASE}/${name}"
     local log_file="${LOG_DIR}/${name}.log"
     echo "[启动] ${name} -> GPU ${gpu}, 日志: ${log_file}"
-    CUDA_VISIBLE_DEVICES=${gpu} nohup python3 -u src/train.py \
-        ${COMMON} \
-        --save_dir "${save_dir}" \
-        ${extra_args} \
+    nohup bash -lc "cd '${MOE_NANJIN_ROOT}' && CUDA_VISIBLE_DEVICES=${gpu} python3 -u src/train.py ${COMMON} --save_dir '${save_dir}' ${extra_args}" \
         > "${log_file}" 2>&1 &
     echo "  PID=$!"
 }
 
 echo "=========================================="
 echo "论文实验后台训练 — $(date '+%Y-%m-%d %H:%M:%S')"
+echo "数据目录: ${DATA_DIR}"
 echo "=========================================="
 
-# GPU1: DeMoE-Rail 完整版（E1+E2+E3）
-run_train "demoe_full" 1 \
-    --use_scene_gating --enhanced_statistic --balance_mode entropy
+# GPU0: RAMR 完整版（scene + regime + robust distribution shift expert）
+run_train "ramr_full_robust" 0 \
+    --use_scene_gating --use_regime_routing --enhanced_statistic \
+    --statistic_feature_set robust --balance_mode entropy
 
-# GPU2: 无场景门控（消融 Table 7）
+# GPU1: 无 regime routing（创新点消融）
+run_train "ablation_no_regime" 1 \
+    --use_scene_gating --no_regime_routing --enhanced_statistic \
+    --statistic_feature_set robust --balance_mode entropy
+
+# GPU2: 无场景门控（场景条件化消融）
 run_train "ablation_no_scene" 2 \
-    --no_scene_gating --enhanced_statistic --balance_mode entropy
+    --no_scene_gating --use_regime_routing --enhanced_statistic \
+    --statistic_feature_set robust --balance_mode entropy
 
-# GPU3: 方差负载均衡（消融 Table 5，旧版）
-run_train "ablation_variance_balance" 3 \
-    --use_scene_gating --enhanced_statistic --balance_mode variance
+# GPU3: 统计专家仅 mean/std/max
+run_train "ablation_stat_basic" 3 \
+    --use_scene_gating --use_regime_routing --no_enhanced_statistic \
+    --statistic_feature_set basic --balance_mode entropy
 
-# GPU4: 无增强统计专家（消融 Table 6）
-run_train "ablation_no_enhanced_stat" 4 \
-    --use_scene_gating --no_enhanced_statistic --balance_mode entropy
+# GPU4: 统计专家加入分位数
+run_train "ablation_stat_quantile" 4 \
+    --use_scene_gating --use_regime_routing --enhanced_statistic \
+    --statistic_feature_set quantile --balance_mode entropy
 
-# GPU5: 复现原文三专家 baseline（可选对照）
-run_train "baseline_repro" 5 \
-    --no_scene_gating --no_enhanced_statistic --balance_mode variance
+# GPU5: 方差负载均衡旧版（均衡正则消融）
+run_train "ablation_variance_balance" 5 \
+    --use_scene_gating --use_regime_routing --enhanced_statistic \
+    --statistic_feature_set robust --balance_mode variance
 
 echo ""
 echo "全部任务已提交后台。查看进度:"
-echo "  tail -f ${LOG_DIR}/demoe_full.log"
+echo "  tail -f ${LOG_DIR}/ramr_full_robust.log"
 echo ""
 echo "训练完成后生成中文配图:"
-echo "  python3 src/plot_paper_figures.py --checkpoint ${CKPT_BASE}/demoe_full/best_model_latest.pth"
+echo "  python3 src/plot_paper_figures.py --checkpoint ${CKPT_BASE}/ramr_full_robust/best_model_latest.pth --data_dir ${DATA_DIR}"
 echo "=========================================="
