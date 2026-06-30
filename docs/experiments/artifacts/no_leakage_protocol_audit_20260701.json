@@ -1,0 +1,280 @@
+{
+  "passed": true,
+  "protocol": "Audit only. The script rebuilds data splits and preprocessing invariants; it does not train, tune, select checkpoints, or evaluate candidate models.",
+  "data_dir": "data",
+  "data_hash": {
+    "from_nj_sha256": "c4f8919ce83c4c677d772036ed42fb5e76c99507f3368e2d32f081b556df4ae7",
+    "to_nj_sha256": "d16b3becfc12ed22a576741a505080e9dc279d4ab54d8c8ef597b729efb3c41e"
+  },
+  "n_days": 846,
+  "n_targets": 20,
+  "lookback": 6,
+  "horizon": 1,
+  "split": {
+    "train": {
+      "start_index": 0,
+      "end_index_exclusive": 423,
+      "n_days": 423,
+      "start_date": "2023-01-01",
+      "end_date": "2024-03-23"
+    },
+    "validation": {
+      "start_index": 423,
+      "end_index_exclusive": 634,
+      "n_days": 211,
+      "start_date": "2024-03-24",
+      "end_date": "2024-10-21"
+    },
+    "test": {
+      "start_index": 634,
+      "end_index_exclusive": 846,
+      "n_days": 212,
+      "start_date": "2024-10-22",
+      "end_date": "2025-05-26"
+    }
+  },
+  "checks": {
+    "chronological_split_non_overlapping": true,
+    "robust_scaler_matches_train_only_fit": true,
+    "robust_scaler_does_not_match_full_data_fit": true,
+    "train_windows_valid": true,
+    "validation_windows_valid": true,
+    "test_windows_valid": true,
+    "fixed_prediction_rows_match_test_dataset": true
+  },
+  "scaler": {
+    "center_first5": [
+      6722.0,
+      226.0,
+      369.0,
+      2368.0,
+      8025.0
+    ],
+    "scale_first5": [
+      1932.0,
+      348.0,
+      248.5,
+      983.0,
+      2605.5
+    ],
+    "train_only_center_first5": [
+      6722.0,
+      226.0,
+      369.0,
+      2368.0,
+      8025.0
+    ],
+    "full_data_center_first5": [
+      7116.0,
+      204.0,
+      319.0,
+      2622.0,
+      8339.5
+    ]
+  },
+  "windows": {
+    "train": {
+      "split": "train",
+      "n_samples": 417,
+      "target_index_min": 6,
+      "target_index_max": 422,
+      "expected_target_range": [
+        0,
+        422
+      ],
+      "input_always_before_target": true,
+      "target_inside_split": true,
+      "violation_count": 0,
+      "violations": [],
+      "first_examples": [
+        {
+          "local_pos": 0,
+          "global_target_index": 6,
+          "input_index_range": [
+            0,
+            5
+          ]
+        },
+        {
+          "local_pos": 1,
+          "global_target_index": 7,
+          "input_index_range": [
+            1,
+            6
+          ]
+        },
+        {
+          "local_pos": 2,
+          "global_target_index": 8,
+          "input_index_range": [
+            2,
+            7
+          ]
+        }
+      ],
+      "last_examples": [
+        {
+          "local_pos": 414,
+          "global_target_index": 420,
+          "input_index_range": [
+            414,
+            419
+          ]
+        },
+        {
+          "local_pos": 415,
+          "global_target_index": 421,
+          "input_index_range": [
+            415,
+            420
+          ]
+        },
+        {
+          "local_pos": 416,
+          "global_target_index": 422,
+          "input_index_range": [
+            416,
+            421
+          ]
+        }
+      ]
+    },
+    "validation": {
+      "split": "validation",
+      "n_samples": 211,
+      "target_index_min": 423,
+      "target_index_max": 633,
+      "expected_target_range": [
+        423,
+        633
+      ],
+      "input_always_before_target": true,
+      "target_inside_split": true,
+      "violation_count": 0,
+      "violations": [],
+      "first_examples": [
+        {
+          "local_pos": 0,
+          "global_target_index": 423,
+          "input_index_range": [
+            417,
+            422
+          ]
+        },
+        {
+          "local_pos": 1,
+          "global_target_index": 424,
+          "input_index_range": [
+            418,
+            423
+          ]
+        },
+        {
+          "local_pos": 2,
+          "global_target_index": 425,
+          "input_index_range": [
+            419,
+            424
+          ]
+        }
+      ],
+      "last_examples": [
+        {
+          "local_pos": 208,
+          "global_target_index": 631,
+          "input_index_range": [
+            625,
+            630
+          ]
+        },
+        {
+          "local_pos": 209,
+          "global_target_index": 632,
+          "input_index_range": [
+            626,
+            631
+          ]
+        },
+        {
+          "local_pos": 210,
+          "global_target_index": 633,
+          "input_index_range": [
+            627,
+            632
+          ]
+        }
+      ]
+    },
+    "test": {
+      "split": "test",
+      "n_samples": 212,
+      "target_index_min": 634,
+      "target_index_max": 845,
+      "expected_target_range": [
+        634,
+        845
+      ],
+      "input_always_before_target": true,
+      "target_inside_split": true,
+      "violation_count": 0,
+      "violations": [],
+      "first_examples": [
+        {
+          "local_pos": 0,
+          "global_target_index": 634,
+          "input_index_range": [
+            628,
+            633
+          ]
+        },
+        {
+          "local_pos": 1,
+          "global_target_index": 635,
+          "input_index_range": [
+            629,
+            634
+          ]
+        },
+        {
+          "local_pos": 2,
+          "global_target_index": 636,
+          "input_index_range": [
+            630,
+            635
+          ]
+        }
+      ],
+      "last_examples": [
+        {
+          "local_pos": 209,
+          "global_target_index": 843,
+          "input_index_range": [
+            837,
+            842
+          ]
+        },
+        {
+          "local_pos": 210,
+          "global_target_index": 844,
+          "input_index_range": [
+            838,
+            843
+          ]
+        },
+        {
+          "local_pos": 211,
+          "global_target_index": 845,
+          "input_index_range": [
+            839,
+            844
+          ]
+        }
+      ]
+    }
+  },
+  "prediction_artifact": {
+    "file": "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
+    "expected_test_rows": 212,
+    "actual_prediction_rows": 212
+  }
+}

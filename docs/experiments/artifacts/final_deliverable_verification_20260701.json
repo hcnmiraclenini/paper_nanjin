@@ -31,8 +31,8 @@
       "name": "paper_docx_copy_synced",
       "passed": true,
       "detail": {
-        "main": "6643523d4f00de5e895287a7629b05d300992d9a0928a703e2395b5b1277fe2a",
-        "copy": "6643523d4f00de5e895287a7629b05d300992d9a0928a703e2395b5b1277fe2a"
+        "main": "d68c8baa257c7101ba1cfc206a6d732030aa0824964f8067dfd462ae9f752cb7",
+        "copy": "d68c8baa257c7101ba1cfc206a6d732030aa0824964f8067dfd462ae9f752cb7"
       }
     },
     {
@@ -54,14 +54,14 @@
       "name": "response_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 144,
+        "runs": 145,
         "fonts": {
-          "Times New Roman": 144
+          "Times New Roman": 145
         },
         "east_asia": {
-          "STSong": 144
+          "STSong": 145
         },
-        "paragraphs": 88,
+        "paragraphs": 89,
         "tables": 0
       }
     },
@@ -98,6 +98,16 @@
         "mae": 0.13802760334469663,
         "valid_count": 4240,
         "ignored_count": 0
+      }
+    },
+    {
+      "name": "no_leakage_protocol_audit",
+      "passed": true,
+      "detail": {
+        "train_days": 423,
+        "validation_days": 211,
+        "test_days": 212,
+        "prediction_rows": 212
       }
     },
     {

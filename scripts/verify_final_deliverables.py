@@ -54,6 +54,7 @@ REQUIRED_FILES = [
     "专家意见逐条修改说明.md",
     "docs/experiments/最终一致性核验_20260701.md",
     "docs/experiments/审稿意见完成度审计_20260701.md",
+    "docs/experiments/无泄露实验协议审计_20260701.md",
     "docs/experiments/固定消融套件复核_20260701.md",
     "docs/experiments/现代强基线优势边界审计_20260701.md",
     "docs/experiments/现代强基线全指标支配审计_20260701.md",
@@ -63,6 +64,7 @@ REQUIRED_FILES = [
     "docs/experiments/Word格式与表格一致性审计_20260701.md",
     "docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json",
     "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
+    "docs/experiments/artifacts/no_leakage_protocol_audit_20260701.json",
     "docs/experiments/artifacts/modern_baselines_correct_data_20260701.json",
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.csv",
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.json",
@@ -251,6 +253,38 @@ def main() -> int:
     )
     add_check(checks, "strict_ramr_ve_final_metrics", final_ok, test_metrics)
 
+    no_leak = json.loads(
+        (ROOT / "docs/experiments/artifacts/no_leakage_protocol_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    no_leak_checks = no_leak["checks"]
+    no_leak_ok = (
+        no_leak["passed"] is True
+        and no_leak["n_days"] == EXPECTED["merged_dates"]
+        and no_leak["n_targets"] == 20
+        and no_leak["lookback"] == 6
+        and no_leak["horizon"] == 1
+        and no_leak["split"]["train"]["n_days"] == 423
+        and no_leak["split"]["validation"]["n_days"] == 211
+        and no_leak["split"]["test"]["n_days"] == 212
+        and no_leak_checks["chronological_split_non_overlapping"] is True
+        and no_leak_checks["robust_scaler_matches_train_only_fit"] is True
+        and no_leak_checks["robust_scaler_does_not_match_full_data_fit"] is True
+        and no_leak_checks["fixed_prediction_rows_match_test_dataset"] is True
+    )
+    add_check(
+        checks,
+        "no_leakage_protocol_audit",
+        no_leak_ok,
+        {
+            "train_days": no_leak["split"]["train"]["n_days"],
+            "validation_days": no_leak["split"]["validation"]["n_days"],
+            "test_days": no_leak["split"]["test"]["n_days"],
+            "prediction_rows": no_leak["prediction_artifact"]["actual_prediction_rows"],
+        },
+    )
+
     ablation = pd.read_csv(ROOT / "docs/experiments/artifacts/fixed_ablation_metrics_20260701.csv")
     required_ablation = {
         "RAMR-full(scene+regime+robust+entropy)",
@@ -427,6 +461,7 @@ def main() -> int:
         ROOT / "专家意见逐条修改说明.md",
         ROOT / "docs/experiments/最终一致性核验_20260701.md",
         ROOT / "docs/experiments/审稿意见完成度审计_20260701.md",
+        ROOT / "docs/experiments/无泄露实验协议审计_20260701.md",
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
         ROOT / "docs/experiments/现代强基线全指标支配审计_20260701.md",
         ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
@@ -446,6 +481,7 @@ def main() -> int:
         "0.138028",
         "data/from_nj.csv",
         "data/to_nj.csv",
+        "无泄露实验协议审计_20260701.md",
         "现代强基线优势边界审计_20260701.md",
         "现代强基线全指标支配审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
@@ -480,6 +516,7 @@ def main() -> int:
             "- 两份 Word 论文文件内容完全一致。",
             "- 论文 Word 和审稿回复 Word 字体均统一为 Times New Roman + STSong。",
             "- Strict RAMR-VE 最终三项指标均优于原 MoE-Rail 阈值。",
+            "- 无泄露实验协议审计确认时间顺序划分、训练集拟合 Scaler、窗口构造和固定测试预测行数均通过。",
             "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
             "- 现代强基线全指标支配审计显示 15/15 个 MAPE/MSE/MAE 点估计比较单元均优于现代基线。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",

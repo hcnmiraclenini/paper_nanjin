@@ -47,6 +47,9 @@ python3 src/plot_paper_figures.py \
 # 最终交付自动核验
 python3 scripts/verify_final_deliverables.py
 
+# 无泄露实验协议审计
+python3 scripts/audit_no_leakage_protocol.py
+
 # 现代强基线优势边界审计
 python3 scripts/analyze_modern_baseline_margin.py
 
@@ -75,6 +78,7 @@ python3 scripts/analyze_regime_gate_alignment.py
 - 完成度审计：`docs/experiments/审稿意见完成度审计_20260701.md`
 - 最终一致性核验：`docs/experiments/最终一致性核验_20260701.md`
 - 自动核验报告：`docs/experiments/最终交付自动核验_20260701.md`
+- 无泄露实验协议审计：`docs/experiments/无泄露实验协议审计_20260701.md`
 - 现代强基线优势边界：`docs/experiments/现代强基线优势边界审计_20260701.md`
 - 现代强基线全指标支配：`docs/experiments/现代强基线全指标支配审计_20260701.md`
 - 站点方向误差剖面：`docs/experiments/站点方向误差剖面审计_20260701.md`
@@ -90,7 +94,7 @@ python3 scripts/analyze_regime_gate_alignment.py
 | MoE-Rail 原论文结果 | 19.41 | 0.037700 | 0.144000 |
 | Strict RAMR-VE | **18.5463** | **0.035640** | **0.138028** |
 
-Strict RAMR-VE 的 checkpoint 权重、集成权重和尺度均由验证集确定，测试集仅用于最终一次评估。固定配方预测摘要见 `docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json`。
+Strict RAMR-VE 的 checkpoint 权重、集成权重和尺度均由验证集确定，测试集仅用于最终一次评估。固定配方预测摘要见 `docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json`；无泄露协议审计见 `docs/experiments/无泄露实验协议审计_20260701.md`。
 
 ## 模型权重
 
