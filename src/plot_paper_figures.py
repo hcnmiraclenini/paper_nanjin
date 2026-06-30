@@ -1,6 +1,6 @@
 """
 论文配图脚本（中文标签）
-- 图：三类场景下门控权重箱线图（E5）
+- 图：测试窗口可用场景下门控权重箱线图（E5）
 - 图：STL分解与门控权重对照（E4）
 """
 
@@ -109,7 +109,7 @@ def collect_gate_weights(model, test_loader, dataset_info, device):
 def plot_gate_boxplot(gates, scenes, out_path):
     """图：场景门控权重箱线图"""
     scene_cn = {'weekday': '工作日', 'weekend': '周末', 'holiday': '节假日'}
-    scene_order = ['weekday', 'weekend', 'holiday']
+    scene_order = [s for s in ['weekday', 'weekend', 'holiday'] if any(sc == s for sc in scenes)]
     n_exp = gates.shape[1]
     labels = EXPERT_CN[:n_exp] if n_exp == 3 else [f'专家{i+1}' for i in range(n_exp)]
     
@@ -124,7 +124,7 @@ def plot_gate_boxplot(gates, scenes, out_path):
             mask = [sc == s for sc in scenes]
             data.append(gates[mask, e] if any(mask) else np.array([]))
         bp = ax.boxplot(
-            data, labels=[scene_cn[s] for s in scene_order],
+            data, tick_labels=[scene_cn[s] for s in scene_order],
             patch_artist=True, widths=0.55
         )
         for patch, c in zip(bp['boxes'], colors):
@@ -280,17 +280,41 @@ def plot_volatility_short_gate(gates, dates, merged_df, target_col, out_path):
     }
 
 
-def ttest_holiday_residual(gates, scenes):
-    """节假日 vs 工作日 残差专家权重 t 检验"""
-    if gates.shape[1] < 3:
-        return None
-    hol = gates[[s == 'holiday' for s in scenes], 2]
-    wkd = gates[[s == 'weekday' for s in scenes], 2]
-    if len(hol) < 5 or len(wkd) < 5:
-        return None
-    t, p = stats.ttest_ind(hol, wkd, equal_var=False)
-    return {'holiday_mean': float(hol.mean()), 'weekday_mean': float(wkd.mean()),
-            't_stat': float(t), 'p_value': float(p)}
+def scene_gate_statistics(gates, scenes):
+    """场景门控权重统计与可检验对比。"""
+    scenes_arr = np.array(scenes)
+    out = {
+        'expert_order': EXPERT_EN_ORDER[:gates.shape[1]],
+        'scene_counts': {s: int((scenes_arr == s).sum()) for s in ['weekday', 'weekend', 'holiday']},
+        'scene_means': {},
+        'tests': {},
+        'note': '',
+    }
+    for s in ['weekday', 'weekend', 'holiday']:
+        mask = scenes_arr == s
+        if mask.any():
+            out['scene_means'][s] = [float(v) for v in gates[mask].mean(axis=0)]
+
+    if out['scene_counts'].get('holiday', 0) < 5:
+        out['note'] = (
+            'Current chronological test split contains fewer than five holiday samples; '
+            'holiday-vs-weekday significance is not claimed.'
+        )
+
+    for a, b in [('weekend', 'weekday'), ('holiday', 'weekday')]:
+        if out['scene_counts'].get(a, 0) < 5 or out['scene_counts'].get(b, 0) < 5:
+            continue
+        for idx, name in enumerate(out['expert_order']):
+            x = gates[scenes_arr == a, idx]
+            y = gates[scenes_arr == b, idx]
+            t, p = stats.ttest_ind(x, y, equal_var=False)
+            out['tests'][f'{a}_vs_{b}_{name}'] = {
+                f'{a}_mean': float(x.mean()),
+                f'{b}_mean': float(y.mean()),
+                't_stat': float(t),
+                'p_value': float(p),
+            }
+    return out
 
 
 def main():
@@ -335,13 +359,12 @@ def main():
         out_dir / '图_波动率与短期专家权重关系.png',
     )
     
-    tt = ttest_holiday_residual(gates, scenes)
+    gate_stats = scene_gate_statistics(gates, scenes)
     stats_path = out_dir / '门控统计检验.json'
     with open(stats_path, 'w', encoding='utf-8') as f:
-        json.dump({'holiday_distribution_shift_test': tt or {}, 'volatility_short_gate': vol_stats}, f, ensure_ascii=False, indent=2)
-    if tt:
-        print(f"节假日残差专家权重均值={tt['holiday_mean']:.4f}, "
-              f"工作日={tt['weekday_mean']:.4f}, p={tt['p_value']:.4e}")
+        json.dump({'scene_gate_statistics': gate_stats, 'volatility_short_gate': vol_stats}, f, ensure_ascii=False, indent=2)
+    for name, item in gate_stats.get('tests', {}).items():
+        print(f"{name}: t={item['t_stat']:.4f}, p={item['p_value']:.4e}")
     print(f'[OK] 统计结果: {stats_path}')
 
 
