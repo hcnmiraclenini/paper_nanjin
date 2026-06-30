@@ -55,6 +55,9 @@ python3 scripts/analyze_target_error_profile.py
 
 # 流量分层误差审计
 python3 scripts/analyze_flow_stratified_errors.py
+
+# Regime 门控对齐审计
+python3 scripts/analyze_regime_gate_alignment.py
 ```
 
 所有 `scripts/*.sh` 会自动 `source scripts/_env.sh`，工作目录为项目根目录。
@@ -72,6 +75,7 @@ python3 scripts/analyze_flow_stratified_errors.py
 - 现代强基线优势边界：`docs/experiments/现代强基线优势边界审计_20260701.md`
 - 站点方向误差剖面：`docs/experiments/站点方向误差剖面审计_20260701.md`
 - 流量分层误差审计：`docs/experiments/流量分层误差审计_20260701.md`
+- Regime 门控对齐审计：`docs/experiments/Regime门控对齐审计_20260701.md`
 
 ## 最终主结果
 

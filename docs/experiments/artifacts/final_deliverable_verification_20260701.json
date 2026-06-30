@@ -31,22 +31,22 @@
       "name": "paper_docx_copy_synced",
       "passed": true,
       "detail": {
-        "main": "761c58b2798146bf703de73a86f267c735707eb43ac1895e80ba16c5d17bc76e",
-        "copy": "761c58b2798146bf703de73a86f267c735707eb43ac1895e80ba16c5d17bc76e"
+        "main": "e3968c400a0a0efe0f38f314b64abed0c2e46fefabba73431907c9923eaa178b",
+        "copy": "e3968c400a0a0efe0f38f314b64abed0c2e46fefabba73431907c9923eaa178b"
       }
     },
     {
       "name": "paper_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 663,
+        "runs": 664,
         "fonts": {
-          "Times New Roman": 663
+          "Times New Roman": 664
         },
         "east_asia": {
-          "STSong": 663
+          "STSong": 664
         },
-        "paragraphs": 223,
+        "paragraphs": 224,
         "tables": 11
       }
     },
@@ -54,14 +54,14 @@
       "name": "response_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 142,
+        "runs": 143,
         "fonts": {
-          "Times New Roman": 142
+          "Times New Roman": 143
         },
         "east_asia": {
-          "STSong": 142
+          "STSong": 143
         },
-        "paragraphs": 85,
+        "paragraphs": 86,
         "tables": 0
       }
     },
@@ -195,6 +195,16 @@
         "high_flow_mape": 13.032710619114695,
         "normal_demand_mape": 16.175524029519806,
         "high_demand_mape": 23.975421400745013
+      }
+    },
+    {
+      "name": "regime_gate_alignment_audit",
+      "passed": true,
+      "detail": {
+        "high_daily_vol_short_mean": 0.671395309796592,
+        "rest_daily_vol_short_mean": 0.42564111980228864,
+        "high_peak_distribution_mean": 0.5909159544082183,
+        "rest_peak_distribution_mean": 0.33027390134722173
       }
     },
     {
