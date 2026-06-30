@@ -68,6 +68,14 @@ def metric_summary(values: np.ndarray) -> dict[str, float]:
     }
 
 
+def portable_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return str(resolved.relative_to(ROOT))
+    except ValueError:
+        return str(resolved)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--predictions", type=Path, default=DEFAULT_PRED)
@@ -131,8 +139,8 @@ def main() -> int:
             "date-level bootstrap is used only for post-hoc uncertainty audit against modern "
             "baseline point estimates."
         ),
-        "predictions_file": str(args.predictions),
-        "baseline_file": str(args.baselines),
+        "predictions_file": portable_path(args.predictions),
+        "baseline_file": portable_path(args.baselines),
         "bootstrap_unit": "test date row with all 20 target variables kept together",
         "bootstrap_samples": args.bootstrap,
         "seed": args.seed,

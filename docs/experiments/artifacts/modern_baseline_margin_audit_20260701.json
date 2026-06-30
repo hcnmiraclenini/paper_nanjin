@@ -1,7 +1,7 @@
 {
   "protocol": "No training or checkpoint selection. Strict RAMR-VE test predictions are fixed; date-level bootstrap is used only for post-hoc uncertainty audit against modern baseline point estimates.",
-  "predictions_file": "/tmp/paper_nanjin_remote_inspect/docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
-  "baseline_file": "/tmp/paper_nanjin_remote_inspect/docs/experiments/artifacts/modern_baselines_correct_data_20260701.json",
+  "predictions_file": "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
+  "baseline_file": "docs/experiments/artifacts/modern_baselines_correct_data_20260701.json",
   "bootstrap_unit": "test date row with all 20 target variables kept together",
   "bootstrap_samples": 2000,
   "seed": 42,
