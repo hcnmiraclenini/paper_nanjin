@@ -15,7 +15,10 @@ import numpy as np
 import pandas as pd
 import torch
 from scipy import stats
-from statsmodels.tsa.seasonal import STL
+try:
+    from statsmodels.tsa.seasonal import STL
+except ImportError:
+    STL = None
 
 from model import MoENanjin
 from data_loader import prepare_data, SCENE_DIM
@@ -145,8 +148,21 @@ def plot_stl_gate(gates, dates, merged_df, target_col, out_path, period=7):
     series = df[target_col].astype(float).values
     time_vals = df['time'].values
     
-    stl = STL(series, period=period, robust=True)
-    res = stl.fit()
+    if STL is not None:
+        stl = STL(series, period=period, robust=True)
+        res = stl.fit()
+        trend = res.trend
+        seasonal = res.seasonal
+        resid = res.resid
+    else:
+        trend = pd.Series(series).rolling(period, center=True, min_periods=1).mean().values
+        detrended = series - trend
+        seasonal_pattern = np.array([
+            np.nanmean(detrended[np.arange(len(detrended)) % period == i])
+            for i in range(period)
+        ])
+        seasonal = seasonal_pattern[np.arange(len(series)) % period]
+        resid = series - trend - seasonal
     
     date_arr = pd.to_datetime(dates)
     gate_df = pd.DataFrame({
@@ -163,17 +179,17 @@ def plot_stl_gate(gates, dates, merged_df, target_col, out_path, period=7):
     axes[0].set_title(f'站点客流序列：{target_col.replace("_from_nj", "").replace("_to_nj", "")}', fontsize=12)
     axes[0].grid(alpha=0.3)
     
-    axes[1].plot(time_vals, res.trend, color='#C44E52', lw=1.2)
+    axes[1].plot(time_vals, trend, color='#C44E52', lw=1.2)
     axes[1].set_ylabel('趋势项 $T_t$')
     axes[1].set_title('STL 趋势分量', fontsize=11)
     axes[1].grid(alpha=0.3)
     
-    axes[2].plot(time_vals, res.seasonal, color='#4C72B0', lw=1.0)
+    axes[2].plot(time_vals, seasonal, color='#4C72B0', lw=1.0)
     axes[2].set_ylabel('周期项 $S_t$')
     axes[2].set_title('STL 周期分量', fontsize=11)
     axes[2].grid(alpha=0.3)
     
-    axes[3].plot(time_vals, res.resid, color='#55A868', lw=0.9, alpha=0.8)
+    axes[3].plot(time_vals, resid, color='#55A868', lw=0.9, alpha=0.8)
     axes[3].set_ylabel('残差项 $R_t$')
     axes[3].set_title('STL 残差分量', fontsize=11)
     axes[3].grid(alpha=0.3)
