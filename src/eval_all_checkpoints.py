@@ -81,7 +81,7 @@ def collect_ckpts(ckpt_dir: Path):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--ckpt_dir', type=str, required=True)
-    parser.add_argument('--data_dir', type=str, default='../data')
+    parser.add_argument('--data_dir', type=str, default='data')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--target_mape', type=float, default=19.5,
                         help='低于此值时高亮提示')

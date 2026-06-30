@@ -7,7 +7,7 @@ LOG_DIR="../logs/reproduce_ablation_20241208"
 mkdir -p "$LOG_DIR"
 
 # 消融实验报告统一配置（dropout=0.1, lr=0.001）
-COMMON="--data_dir ../data --lookback 6 --horizon 1 --batch_size 64 \
+COMMON="--data_dir data --lookback 6 --horizon 1 --batch_size 64 \
   --hidden_dim 512 --dropout 0.1 --num_epochs 300 --patience 50 \
   --learning_rate 0.001 --weight_decay 0.0001 \
   --lambda_mape 0.5 --lambda_mae 1.0 --lambda_mse 0.5 \

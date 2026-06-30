@@ -236,7 +236,7 @@ def plot_results(df, output_dir):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data_dir", default="/root/data3/huangchanni/data")
+    parser.add_argument("--data_dir", default="data")
     parser.add_argument("--output_dir", default="../results/modern_baselines")
     parser.add_argument("--lookback", type=int, default=6)
     parser.add_argument("--horizon", type=int, default=1)

@@ -6,7 +6,7 @@ source "$(dirname "$0")/_env.sh"
 
 # 基础配置（与消融实验完全一致，确保基线模型也能达到20%以下）
 # 使用后面的GPU（3,4,5等），避免使用0,1,2
-BASE_CONFIG="--data_dir ../data \
+BASE_CONFIG="--data_dir data \
     --lookback 6 \
     --horizon 1 \
     --batch_size 64 \
@@ -72,4 +72,3 @@ echo ""
 echo "可以使用以下命令评估："
 echo "  python3 src/evaluate.py --checkpoint ../checkpoints/moe_nanjin/best_model_latest.pth"
 echo "=========================================="
-

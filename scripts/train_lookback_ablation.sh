@@ -6,7 +6,7 @@ source "$(dirname "$0")/_env.sh"
 
 # 基础配置（与基线模型完全一致，只改变lookback）
 # 参考：README_ABLATION.txt 中的基线模型配置
-BASE_CONFIG="--data_dir ../data \
+BASE_CONFIG="--data_dir data \
     --horizon 1 \
     --batch_size 64 \
     --hidden_dim 512 \
@@ -81,7 +81,7 @@ for LOOKBACK in "${LOOKBACK_VALUES[@]}"; do
     echo "[评估] Lookback=$LOOKBACK 测试集性能..."
     python3 src/evaluate.py \
         --checkpoint "$SAVE_DIR/best_model_latest.pth" \
-        --data_dir ../data \
+        --data_dir data \
         --batch_size 64 \
         --num_workers 8 > "$RESULTS_DIR/lookback_${LOOKBACK}_evaluation.txt" 2>&1
     
@@ -118,4 +118,3 @@ echo ""
 echo "可以使用以下命令查看结果："
 echo "  cat $RESULTS_DIR/lookback_*_evaluation.txt"
 echo "=========================================="
-

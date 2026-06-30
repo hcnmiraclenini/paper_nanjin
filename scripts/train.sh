@@ -31,7 +31,7 @@ case $CONFIG in
         echo "开始训练（优化配置）"
         echo "=========================================="
         python3 src/train.py \
-            --data_dir ../data \
+            --data_dir data \
             --lookback 6 \
             --horizon 1 \
             --batch_size 64 \
@@ -53,4 +53,3 @@ esac
 echo "=========================================="
 echo "训练完成！"
 echo "=========================================="
-

@@ -5,7 +5,7 @@ source "$(dirname "$0")/_env.sh"
 
 LOG_DIR="../logs/paper_experiments"
 CKPT_BASE="../checkpoints/paper_experiments"
-DATA_DIR="${DATA_DIR:-/root/data3/huangchanni/data}"
+DATA_DIR="${DATA_DIR:-${MOE_NANJIN_ROOT}/data}"
 mkdir -p "$LOG_DIR" "$CKPT_BASE"
 
 # 与原文 baseline 一致的超参

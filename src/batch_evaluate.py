@@ -39,7 +39,7 @@ def evaluate_checkpoint(checkpoint_path, device, data_cache=None):
             test_loader, scaler, dataset_info = data_cache[cache_key]
         else:
             _, _, test_loader, scaler, dataset_info = prepare_data(
-                data_dir='../data',
+                data_dir='data',
                 target_cols=None,
                 lookback=lookback,
                 horizon=config.get('horizon', 1),
@@ -218,4 +218,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

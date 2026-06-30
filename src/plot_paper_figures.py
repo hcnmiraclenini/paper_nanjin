@@ -296,7 +296,7 @@ def ttest_holiday_residual(gates, scenes):
 def main():
     parser = argparse.ArgumentParser(description='生成论文中文配图')
     parser.add_argument('--checkpoint', type=str, required=True)
-    parser.add_argument('--data_dir', type=str, default='../data')
+    parser.add_argument('--data_dir', type=str, default='data')
     parser.add_argument('--output_dir', type=str, default='../results/paper_figures')
     parser.add_argument('--target_col', type=str, default=None,
                         help='STL分析用的目标列，默认第一个from变量')

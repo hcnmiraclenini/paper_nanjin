@@ -122,7 +122,7 @@ def evaluate(model, test_loader, device, scaler=None):
 def main():
     parser = argparse.ArgumentParser(description='MoE-Nanjin 评估脚本')
     parser.add_argument('--checkpoint', type=str, required=True, help='模型checkpoint路径')
-    parser.add_argument('--data_dir', type=str, default='../data', help='数据目录')
+    parser.add_argument('--data_dir', type=str, default='data', help='数据目录（默认读取项目内 data/from_nj.csv 与 data/to_nj.csv）')
     parser.add_argument('--batch_size', type=int, default=32, help='Batch大小')
     parser.add_argument('--num_workers', type=int, default=4, help='DataLoader worker数量')
     

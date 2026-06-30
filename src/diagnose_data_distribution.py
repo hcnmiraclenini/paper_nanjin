@@ -12,7 +12,7 @@ from sklearn.preprocessing import RobustScaler
 
 def main():
     # 加载数据
-    data_dir = Path('../data')
+    data_dir = Path('data')
     merged_df, target_cols = load_and_merge_data(data_dir, use_both=True)
     
     # 提取目标数据
@@ -91,4 +91,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -13,7 +13,7 @@ sleep 2
 
 echo "=== 原文基线重训（测试集选模） $(date) ===" | tee "$LOG"
 CUDA_VISIBLE_DEVICES=1 nohup python3 -u src/train.py \
-    --data_dir ../data \
+    --data_dir data \
     --lookback 6 --horizon 1 --batch_size 64 \
     --hidden_dim 512 --dropout 0.15 \
     --num_epochs 300 --patience 80 \

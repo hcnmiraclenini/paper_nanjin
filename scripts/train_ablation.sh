@@ -9,7 +9,7 @@ source "$(dirname "$0")/_env.sh"
 
 # 基础配置（与原始实验保持一致，MAPE=20%的配置）
 # 使用后面的GPU（3,4,5等），避免使用0,1,2
-BASE_CONFIG="--data_dir ../data \
+BASE_CONFIG="--data_dir data \
     --lookback 6 \
     --horizon 1 \
     --batch_size 64 \
@@ -107,4 +107,3 @@ echo "  - ../checkpoints/moe_nanjin_no_shortterm/"
 echo ""
 echo "可以使用 evaluate.py 评估各实验的测试集性能"
 echo "=========================================="
-

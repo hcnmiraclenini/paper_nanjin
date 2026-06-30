@@ -464,7 +464,7 @@ def main():
     parser = argparse.ArgumentParser(description='MoE-Nanjin 训练脚本')
     
     # 数据参数
-    parser.add_argument('--data_dir', type=str, default='../data', help='数据目录（相对路径从当前工作目录解析，绝对路径直接使用）')
+    parser.add_argument('--data_dir', type=str, default='data', help='数据目录（默认读取项目内 data/from_nj.csv 与 data/to_nj.csv）')
     parser.add_argument('--lookback', type=int, default=6, help='回看窗口长度')
     parser.add_argument('--horizon', type=int, default=1, help='预测窗口长度')
     parser.add_argument('--batch_size', type=int, default=64, help='Batch大小（默认64，可根据GPU内存调整）')
