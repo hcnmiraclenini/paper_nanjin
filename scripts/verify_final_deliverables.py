@@ -57,6 +57,7 @@ REQUIRED_FILES = [
     "docs/experiments/固定消融套件复核_20260701.md",
     "docs/experiments/现代强基线优势边界审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
+    "docs/experiments/流量分层误差审计_20260701.md",
     "docs/experiments/Word格式与表格一致性审计_20260701.md",
     "docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json",
     "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
@@ -65,6 +66,8 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.json",
     "docs/experiments/artifacts/target_error_profile_20260701.csv",
     "docs/experiments/artifacts/target_error_profile_20260701.json",
+    "docs/experiments/artifacts/flow_stratified_error_audit_20260701.csv",
+    "docs/experiments/artifacts/flow_stratified_error_audit_20260701.json",
     "docs/experiments/artifacts/fixed_ablation_metrics_20260701.csv",
     "docs/experiments/artifacts/fixed_ablation_metrics_20260701.json",
 ]
@@ -320,6 +323,43 @@ def main() -> int:
         },
     )
 
+    flow = json.loads(
+        (ROOT / "docs/experiments/artifacts/flow_stratified_error_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    flow_rows = {(row["group_type"], row["group"]): row for row in flow["rows"]}
+    low_flow = flow_rows.get(("flow_magnitude", "low_flow_<500"), {})
+    high_flow = flow_rows.get(("flow_magnitude", "high_flow_>=3000"), {})
+    normal_days = flow_rows.get(("daily_total", "normal_demand_days"), {})
+    high_days = flow_rows.get(("daily_total", "high_demand_days"), {})
+    flow_ok = (
+        flow["n_rows"] == 212
+        and flow["n_targets"] == 20
+        and approx_equal(flow["overall"]["mape"], EXPECTED["final_mape"])
+        and approx_equal(flow["overall"]["mse"], EXPECTED["final_mse"])
+        and approx_equal(flow["overall"]["mae"], EXPECTED["final_mae"])
+        and low_flow
+        and high_flow
+        and normal_days
+        and high_days
+        and low_flow["mape"] > high_flow["mape"]
+        and high_flow["mape"] < 15.0
+        and high_days["mape"] > normal_days["mape"]
+        and normal_days["mape"] < 20.0
+    )
+    add_check(
+        checks,
+        "flow_stratified_error_audit",
+        flow_ok,
+        {
+            "low_flow_mape": low_flow.get("mape"),
+            "high_flow_mape": high_flow.get("mape"),
+            "normal_demand_mape": normal_days.get("mape"),
+            "high_demand_mape": high_days.get("mape"),
+        },
+    )
+
     scan_files = [
         ROOT / "README.md",
         ROOT / "paper/论文终稿.md",
@@ -328,6 +368,7 @@ def main() -> int:
         ROOT / "docs/experiments/审稿意见完成度审计_20260701.md",
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
         ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
+        ROOT / "docs/experiments/流量分层误差审计_20260701.md",
     ]
     banned_hits = scan_banned(scan_files)
     add_check(checks, "stale_phrase_scan", not banned_hits, banned_hits)
@@ -344,6 +385,7 @@ def main() -> int:
         "data/to_nj.csv",
         "现代强基线优势边界审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
+        "流量分层误差审计_20260701.md",
     ]
     readme_missing = [item for item in readme_required if item not in readme]
     add_check(checks, "readme_final_entrypoints", not readme_missing, readme_missing)
@@ -375,6 +417,7 @@ def main() -> int:
             "- Strict RAMR-VE 最终三项指标均优于原 MoE-Rail 阈值。",
             "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
+            "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",
             "- 固定消融套件和审稿回复覆盖检查通过。",
         ]
     )
