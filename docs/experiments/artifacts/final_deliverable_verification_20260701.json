@@ -208,6 +208,14 @@
       }
     },
     {
+      "name": "text_claim_consistency_audit",
+      "passed": true,
+      "detail": {
+        "passed": true,
+        "check_count": 12
+      }
+    },
+    {
       "name": "target_error_profile",
       "passed": true,
       "detail": {

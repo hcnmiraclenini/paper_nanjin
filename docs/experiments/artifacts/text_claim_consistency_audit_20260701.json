@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "protocol": "Text-claim audit only. Reads fixed evidence artifacts and manuscript/reply text; performs no training, tuning, checkpoint selection, or test-set re-evaluation.",
+  "checks": [
+    {
+      "name": "authoritative_final_metrics_loaded",
+      "passed": true,
+      "detail": {
+        "mape": 18.546323040648975,
+        "mse": 0.035640054881848904,
+        "mae": 0.13802760334469663,
+        "valid_count": 4240
+      }
+    },
+    {
+      "name": "authoritative_no_leakage_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "split": {
+          "train": {
+            "start_index": 0,
+            "end_index_exclusive": 423,
+            "n_days": 423,
+            "start_date": "2023-01-01",
+            "end_date": "2024-03-23"
+          },
+          "validation": {
+            "start_index": 423,
+            "end_index_exclusive": 634,
+            "n_days": 211,
+            "start_date": "2024-03-24",
+            "end_date": "2024-10-21"
+          },
+          "test": {
+            "start_index": 634,
+            "end_index_exclusive": 846,
+            "n_days": 212,
+            "start_date": "2024-10-22",
+            "end_date": "2025-05-26"
+          }
+        },
+        "from_hash": "c4f8919ce83c4c677d772036ed42fb5e76c99507f3368e2d32f081b556df4ae7",
+        "to_hash": "d16b3becfc12ed22a576741a505080e9dc279d4ab54d8c8ef597b729efb3c41e",
+        "scaler_checks": {
+          "train_only": true,
+          "not_full_data": true
+        }
+      }
+    },
+    {
+      "name": "authoritative_dominance_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "point_dominance_cells": 15,
+        "point_dominance_total_cells": 15,
+        "closest_baseline": "FreEformer"
+      }
+    },
+    {
+      "name": "authoritative_paired_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "point_dominance": "15/15",
+        "min_all_three_prob": 0.894,
+        "closest": "TimeMixer"
+      }
+    },
+    {
+      "name": "final_metrics_written_in_core_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "no_leakage_protocol_written_in_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "paired_modern_baseline_claims_written_in_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "boundary_language_written_in_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "overclaim_phrase_scan",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "target_profile_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "targets_below_20_mape": 16,
+        "targets_below_30_mape": 17
+      }
+    },
+    {
+      "name": "flow_stratified_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "high_flow_mape": 13.032710619114695,
+        "normal_demand_mape": 16.175524029519806,
+        "high_demand_mape": 23.975421400745013
+      }
+    },
+    {
+      "name": "regime_gate_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "high_daily_vol_short_delta": 0.24575418999430337,
+        "high_peak_distribution_delta": 0.2606420530609966
+      }
+    }
+  ]
+}

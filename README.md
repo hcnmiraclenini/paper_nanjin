@@ -59,6 +59,9 @@ python3 scripts/analyze_modern_baseline_dominance.py
 # 现代强基线配对预测审计
 python3 scripts/analyze_modern_baseline_paired.py
 
+# 论文数值与口径一致性审计
+python3 scripts/audit_text_claim_consistency.py
+
 # 站点方向误差剖面审计
 python3 scripts/analyze_target_error_profile.py
 
@@ -85,6 +88,7 @@ python3 scripts/analyze_regime_gate_alignment.py
 - 现代强基线优势边界：`docs/experiments/现代强基线优势边界审计_20260701.md`
 - 现代强基线全指标支配：`docs/experiments/现代强基线全指标支配审计_20260701.md`
 - 现代强基线配对预测审计：`docs/experiments/现代强基线配对预测审计_20260701.md`
+- 论文数值与口径一致性审计：`docs/experiments/论文数值与口径一致性审计_20260701.md`
 - 站点方向误差剖面：`docs/experiments/站点方向误差剖面审计_20260701.md`
 - 流量分层误差审计：`docs/experiments/流量分层误差审计_20260701.md`
 - Regime 门控对齐审计：`docs/experiments/Regime门控对齐审计_20260701.md`
@@ -99,6 +103,8 @@ python3 scripts/analyze_regime_gate_alignment.py
 | Strict RAMR-VE | **18.5463** | **0.035640** | **0.138028** |
 
 Strict RAMR-VE 的 checkpoint 权重、集成权重和尺度均由验证集确定，测试集仅用于最终一次评估。固定配方预测摘要见 `docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json`；无泄露协议审计见 `docs/experiments/无泄露实验协议审计_20260701.md`。
+
+现代强基线配对预测审计显示，在相同测试日期和 20 个目标变量上，Strict RAMR-VE 相对 DLinear、PatchTST、iTransformer、TimeMixer、FreEformer 的 MAPE/MSE/MAE 共 15/15 个点估计比较单元均更低；日期级 bootstrap 中三指标同时更优的最低概率为 89.40%，最接近边界为 TimeMixer。该配对审计是补充逐样本可比性证据，不替换原现代强基线主表。
 
 ## 模型权重
 
