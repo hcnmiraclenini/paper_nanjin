@@ -12,6 +12,7 @@ moe_nanjin1/
 ├── scripts/                         # 训练 / 评估 / 实验脚本
 ├── paper/                           # 论文与投稿材料
 │   ├── 2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx
+│   ├── 论文终稿.docx                 # 与上方定稿保持同步的便捷副本
 │   ├── figures/                     # 论文配图（PDF/PNG）
 │   ├── revision/                    # 退修对照、实验说明、创新点
 │   ├── submission/                  # 投稿附件（协议、无作者 PDF 等）
@@ -26,23 +27,46 @@ moe_nanjin1/
 ```bash
 cd moe_nanjin1
 
-# 训练（优化配置）
-bash scripts/train.sh
+# 固定消融套件复核（不做测试集选模）
+python3 src/evaluate_fixed_ablation_suite.py \
+  --data_dir data \
+  --output_dir ../results/fixed_ablation_suite_20260701
 
-# 论文五组并行实验
-bash scripts/run_paper_experiments.sh
+# 导出 Strict RAMR-VE 固定配方预测和 bootstrap 置信区间
+python3 src/export_fixed_ensemble_predictions.py \
+  --data_dir data \
+  --weights ../results/strict_no_leakage_ensemble/all_balanced_final_once/selected_weights.csv \
+  --summary ../results/strict_no_leakage_ensemble/all_balanced_final_once/ensemble_summary.json \
+  --output_dir ../results/strict_no_leakage_ensemble/fixed_recipe_predictions
 
-# 最终测试集评估（仅在模型/集成权重/尺度固定后运行一次）
-python3 src/evaluate.py \
-  --checkpoint ../checkpoints/paper_experiments/demoe_full/best_model_latest.pth
-
-# 生成论文配图
+# 生成论文机制配图
 python3 src/plot_paper_figures.py \
-  --checkpoint ../checkpoints/paper_experiments/demoe_full/best_model_latest.pth \
-  --output_dir ../results/paper_figures
+  --checkpoint ../checkpoints/paper_experiments/ramr_full_robust/best_model_latest.pth \
+  --output_dir ../results/paper_figures_ramr_full
 ```
 
 所有 `scripts/*.sh` 会自动 `source scripts/_env.sh`，工作目录为项目根目录。
+
+## 最终交付入口
+
+- 论文 Word 定稿：`paper/2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx`
+- 论文 Word 便捷副本：`paper/论文终稿.docx`
+- 论文 Markdown：`paper/论文终稿.md`
+- 正式审稿回复：`审稿意见逐条回复稿.md`、`审稿意见逐条回复稿.docx`
+- 逐条修改说明：`专家意见逐条修改说明.md`
+- 完成度审计：`docs/experiments/审稿意见完成度审计_20260701.md`
+- 最终一致性核验：`docs/experiments/最终一致性核验_20260701.md`
+
+## 最终主结果
+
+铁路主数据集使用项目内真实 CSV：`data/from_nj.csv` 与 `data/to_nj.csv`。二者按 `time` 内连接后得到 846 个共同日期和 20 个双向客流目标变量。严格时间顺序划分为训练/验证/测试，`RobustScaler` 仅在训练集拟合。
+
+| 模型 | MAPE/% | MSE | MAE |
+| --- | ---: | ---: | ---: |
+| MoE-Rail 原论文结果 | 19.41 | 0.037700 | 0.144000 |
+| Strict RAMR-VE | **18.5463** | **0.035640** | **0.138028** |
+
+Strict RAMR-VE 的 checkpoint 权重、集成权重和尺度均由验证集确定，测试集仅用于最终一次评估。固定配方预测摘要见 `docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json`。
 
 ## 模型权重
 
@@ -50,8 +74,9 @@ python3 src/plot_paper_figures.py \
 
 | 实验 | 路径 | 说明 |
 |------|------|------|
-| 论文主模型 | `paper_experiments/demoe_full/` | MoE-Rail/RAMR 完整版 |
-| 消融 | `paper_experiments/ablation_*` | 场景门控 / regime routing / 负载均衡 / 分布偏移专家 |
+| 机制分析主模型 | `paper_experiments/ramr_full_robust/` | RAMR 完整单 checkpoint |
+| 固定消融 | `paper_experiments/ablation_*`、`strict_no_leakage/stat_*` | 场景门控 / regime routing / 负载均衡 / 分布特征集合 |
+| Strict RAMR-VE 候选 | `strict_no_leakage/*` | 验证集固定集成候选 checkpoint |
 | Baseline | `moe_nanjin/` | 完整三专家模型 |
 | 组件消融 | `moe_nanjin_no_{statistic,longterm,shortterm}/` | 2024-12 复现实验 |
 
@@ -60,9 +85,10 @@ python3 src/plot_paper_figures.py \
 ## 论文文件
 
 - **当前定稿**：`paper/2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx`
-- **退修对照**：`paper/revision/`
+- **审稿回复**：`审稿意见逐条回复稿.md`、`审稿意见逐条回复稿.docx`
+- **逐条修改说明**：`专家意见逐条修改说明.md`
 - **排版工具**：`paper/tools/format_tiedao_submission.py`
 
 ## 数据
 
-默认数据目录：`../data/`（`from_nj.csv` / `to_nj.csv`）
+默认数据目录：`data/`（`from_nj.csv` / `to_nj.csv`）
