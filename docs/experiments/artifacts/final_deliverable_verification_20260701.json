@@ -1,0 +1,162 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "name": "required_files_exist",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "real_data_integrity",
+      "passed": true,
+      "detail": {
+        "from_hash": "c4f8919ce83c4c677d772036ed42fb5e76c99507f3368e2d32f081b556df4ae7",
+        "to_hash": "d16b3becfc12ed22a576741a505080e9dc279d4ab54d8c8ef597b729efb3c41e",
+        "from_shape": [
+          854,
+          11
+        ],
+        "to_shape": [
+          852,
+          11
+        ],
+        "merged_dates": 846,
+        "from_missing": 0,
+        "to_missing": 0,
+        "from_duplicate_time": 0,
+        "to_duplicate_time": 0
+      }
+    },
+    {
+      "name": "paper_docx_copy_synced",
+      "passed": true,
+      "detail": {
+        "main": "c700efacb0b9edd87d7efe6cd19e97c2d850a0441683eb4ee267a70bd5934d51",
+        "copy": "c700efacb0b9edd87d7efe6cd19e97c2d850a0441683eb4ee267a70bd5934d51"
+      }
+    },
+    {
+      "name": "paper_word_fonts",
+      "passed": true,
+      "detail": {
+        "runs": 660,
+        "fonts": {
+          "Times New Roman": 660
+        },
+        "east_asia": {
+          "STSong": 660
+        },
+        "paragraphs": 220,
+        "tables": 11
+      }
+    },
+    {
+      "name": "response_word_fonts",
+      "passed": true,
+      "detail": {
+        "runs": 139,
+        "fonts": {
+          "Times New Roman": 139
+        },
+        "east_asia": {
+          "STSong": 139
+        },
+        "paragraphs": 82,
+        "tables": 0
+      }
+    },
+    {
+      "name": "reviewer_response_coverage",
+      "passed": true,
+      "detail": {
+        "heading_count": 15,
+        "headings": [
+          "### 1. 统计特征能否解释突发事件、极端天气等不确定因素",
+          "### 2. 数据集介绍需增加表格",
+          "### 3. 缺少特征工程说明",
+          "### 4. 短期专家权重低的问题",
+          "### 5. Traffic 跨粒度泛化实验跨度较大",
+          "### 6. 摘要尽量不要出现公式",
+          "### 7. VAR 表现差，建议重跑或更换对比方法",
+          "### 8. 英文字体不统一",
+          "### 9. 图4第一张图不清晰",
+          "### 10. `St`、`Tt`、`Rt` 下标不规范",
+          "### 1. 创新性不足，像已有模块组合",
+          "### 2. 需与 PatchTST、TimeMixer、iTransformer、FreEformer 等新方法对比",
+          "### 3. MSE 好但 MAE 一般，跨域泛化结论不充分",
+          "### 4. 消融实验建议增加日历特征输入、负载均衡约束",
+          "### 5. 文字表达不清晰：日粒度预测不应强调日内高频、早晚高峰；负载均衡称谓不一致"
+        ]
+      }
+    },
+    {
+      "name": "strict_ramr_ve_final_metrics",
+      "passed": true,
+      "detail": {
+        "mape": 18.546323040648975,
+        "mse": 0.035640054881848904,
+        "mae": 0.13802760334469663,
+        "valid_count": 4240,
+        "ignored_count": 0
+      }
+    },
+    {
+      "name": "fixed_ablation_evidence",
+      "passed": true,
+      "detail": [
+        {
+          "name": "RAMR-full(scene+regime+robust+entropy)",
+          "test_mape": 21.670550107955933,
+          "test_mse": 0.0461754457948418,
+          "test_mae": 0.1565784687080971
+        },
+        {
+          "name": "w/o scene gating",
+          "test_mape": 23.38858544826508,
+          "test_mse": 0.0521370739345981,
+          "test_mae": 0.1718261134675679
+        },
+        {
+          "name": "w/o regime routing",
+          "test_mape": 22.914321720600128,
+          "test_mse": 0.0443035661535966,
+          "test_mae": 0.1607401681321865
+        },
+        {
+          "name": "variance load balance",
+          "test_mape": 21.76998257637024,
+          "test_mse": 0.0463778497878874,
+          "test_mae": 0.1584591238676589
+        },
+        {
+          "name": "distribution basic(mean/std/max)",
+          "test_mape": 21.020054817199707,
+          "test_mse": 0.0427874461754329,
+          "test_mae": 0.1574339123696298
+        },
+        {
+          "name": "distribution quantile",
+          "test_mape": 19.04467642307281,
+          "test_mse": 0.0356783090071952,
+          "test_mae": 0.1369874269758815
+        },
+        {
+          "name": "MAE-aware robust",
+          "test_mape": 21.21856063604355,
+          "test_mse": 0.0498229825772754,
+          "test_mae": 0.1642725975523204
+        }
+      ]
+    },
+    {
+      "name": "stale_phrase_scan",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "readme_final_entrypoints",
+      "passed": true,
+      "detail": []
+    }
+  ]
+}
