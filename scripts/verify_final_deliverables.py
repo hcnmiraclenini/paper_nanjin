@@ -60,6 +60,7 @@ REQUIRED_FILES = [
     "docs/experiments/现代强基线全指标支配审计_20260701.md",
     "docs/experiments/现代强基线配对预测审计_20260701.md",
     "docs/experiments/现代强基线配对显著性审计_20260701.md",
+    "docs/experiments/高需求高波动压力场景审计_20260701.md",
     "docs/experiments/论文数值与口径一致性审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/流量分层误差审计_20260701.md",
@@ -78,6 +79,8 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/modern_baseline_paired_audit_20260701.json",
     "docs/experiments/artifacts/paired_significance_audit_20260701.csv",
     "docs/experiments/artifacts/paired_significance_audit_20260701.json",
+    "docs/experiments/artifacts/event_stress_baseline_audit_20260701.csv",
+    "docs/experiments/artifacts/event_stress_baseline_audit_20260701.json",
     "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
@@ -432,6 +435,34 @@ def main() -> int:
         },
     )
 
+    event_stress = json.loads(
+        (ROOT / "docs/experiments/artifacts/event_stress_baseline_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    event_summary = event_stress["summary"]
+    event_ok = (
+        event_stress["passed"] is True
+        and event_stress["n_dates"] == 212
+        and event_stress["n_targets"] == 20
+        and event_stress["test_start_index"] == 634
+        and event_summary["high_demand_ramr_best_all_metrics"] is True
+        and event_summary["high_abs_shift_ramr_best_mape"] is True
+        and event_summary["high_abs_shift_best_mse_model"] == "TimeMixer"
+        and event_summary["high_abs_shift_best_mae_model"] == "TimeMixer"
+    )
+    add_check(
+        checks,
+        "event_stress_baseline_audit",
+        event_ok,
+        {
+            "high_demand_ramr_best_all_metrics": event_summary["high_demand_ramr_best_all_metrics"],
+            "high_abs_shift_ramr_best_mape": event_summary["high_abs_shift_ramr_best_mape"],
+            "high_abs_shift_best_mse_model": event_summary["high_abs_shift_best_mse_model"],
+            "high_abs_shift_best_mae_model": event_summary["high_abs_shift_best_mae_model"],
+        },
+    )
+
     text_claim = json.loads(
         (ROOT / "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json").read_text(
             encoding="utf-8"
@@ -579,6 +610,7 @@ def main() -> int:
         "现代强基线全指标支配审计_20260701.md",
         "现代强基线配对预测审计_20260701.md",
         "现代强基线配对显著性审计_20260701.md",
+        "高需求高波动压力场景审计_20260701.md",
         "论文数值与口径一致性审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
         "流量分层误差审计_20260701.md",
@@ -617,6 +649,7 @@ def main() -> int:
             "- 现代强基线全指标支配审计显示 15/15 个 MAPE/MSE/MAE 点估计比较单元均优于现代基线。",
             "- 现代强基线配对预测审计显示同一测试日期与目标变量下 15/15 个点估计比较单元均优，三指标同时更优的 bootstrap 概率最低为 89.40%。",
             "- 现代强基线配对统计审计显示 15/15 个 Wilcoxon-Holm 单侧检验显著，并披露 TimeMixer-MSE 是 bootstrap/符号置换边界单元。",
+            "- 高需求高波动压力场景审计显示高需求日三指标均优于现代强基线，并披露高日际变化日 MSE/MAE 的 TimeMixer 边界。",
             "- 论文数值与口径一致性审计确认论文、审稿回复、逐条说明和 Word 稿中的关键数字与实验边界均已对齐权威 artifact。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",

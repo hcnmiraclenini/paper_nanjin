@@ -119,6 +119,7 @@ def main() -> int:
     dominance = read_json(ARTIFACT_DIR / "modern_baseline_dominance_audit_20260701.json")
     paired = read_json(ARTIFACT_DIR / "modern_baseline_paired_audit_20260701.json")
     paired_sig = read_json(ARTIFACT_DIR / "paired_significance_audit_20260701.json")
+    event_stress = read_json(ARTIFACT_DIR / "event_stress_baseline_audit_20260701.json")
     target_profile = read_json(ARTIFACT_DIR / "target_error_profile_20260701.json")
     flow = read_json(ARTIFACT_DIR / "flow_stratified_error_audit_20260701.json")
     regime = read_json(ARTIFACT_DIR / "regime_gate_alignment_audit_20260701.json")
@@ -228,6 +229,29 @@ def main() -> int:
         },
     )
 
+    event_summary = event_stress["summary"]
+    event_stress_ok = (
+        event_stress["passed"] is True
+        and event_stress["n_dates"] == 212
+        and event_stress["n_targets"] == 20
+        and event_stress["test_start_index"] == 634
+        and event_summary["high_demand_ramr_best_all_metrics"] is True
+        and event_summary["high_abs_shift_ramr_best_mape"] is True
+        and event_summary["high_abs_shift_best_mse_model"] == "TimeMixer"
+        and event_summary["high_abs_shift_best_mae_model"] == "TimeMixer"
+    )
+    add_check(
+        checks,
+        "authoritative_event_stress_artifact_loaded",
+        event_stress_ok,
+        {
+            "high_demand_ramr_best_all_metrics": event_summary["high_demand_ramr_best_all_metrics"],
+            "high_abs_shift_ramr_best_mape": event_summary["high_abs_shift_ramr_best_mape"],
+            "high_abs_shift_best_mse_model": event_summary["high_abs_shift_best_mse_model"],
+            "high_abs_shift_best_mae_model": event_summary["high_abs_shift_best_mae_model"],
+        },
+    )
+
     core_metric_needles = ["18.5463", "0.035640", "0.138028"]
     core_docs = ["readme", "paper_md", "response_md", "expert_response_md", "final_consistency_md", "paper_docx"]
     metric_missing = {
@@ -274,6 +298,21 @@ def main() -> int:
     }
     paired_sig_missing = {name: miss for name, miss in paired_sig_missing.items() if miss}
     add_check(checks, "paired_significance_claims_written_in_texts", not paired_sig_missing, paired_sig_missing)
+
+    event_groups = [
+        ("高需求", ["高需求"]),
+        ("23.9754", ["23.9754"]),
+        ("高日际变化", ["高日际变化", "日际客流绝对变化", "日际突变"]),
+        ("24.8108", ["24.8108"]),
+        ("TimeMixer", ["TimeMixer"]),
+        ("因果", ["因果"]),
+    ]
+    event_docs = ["readme", "paper_md", "response_md", "expert_response_md", "final_consistency_md", "paper_docx", "response_docx"]
+    event_missing = {
+        name: missing_groups(texts[name], event_groups) for name in event_docs
+    }
+    event_missing = {name: miss for name, miss in event_missing.items() if miss}
+    add_check(checks, "event_stress_claims_written_in_texts", not event_missing, event_missing)
 
     boundary_groups = [
         ("结构鲁棒", ["结构鲁棒"]),
@@ -367,6 +406,7 @@ def main() -> int:
         f"- 现代强基线点估计支配：{dominance['point_dominance_cells']}/{dominance['point_dominance_total_cells']} 个 MAPE/MSE/MAE 比较单元更低。",
         f"- 现代强基线配对预测审计：{paired['summary']['point_dominance_cells']}/{paired['summary']['point_dominance_total_cells']} 个点估计比较单元更低，三指标同时更优的日期级 bootstrap 概率最低为 {paired['summary']['min_all_three_prob'] * 100:.2f}%，最接近边界为 {paired['summary']['closest_by_all_three_prob']}。",
         f"- 现代强基线配对统计审计：{paired_sig_summary['wilcoxon_holm_significant_0_01_cells']}/{paired_sig_summary['total_cells']} 个 Wilcoxon-Holm 单侧检验在 α=0.01 下显著，bootstrap/符号置换边界单元为 TimeMixer-MSE。",
+        f"- 高需求/高波动压力审计：高需求日 Strict RAMR-VE 三指标均优于现代强基线；高日际变化日 MAPE 最优，但 MSE/MAE 边界模型为 TimeMixer。",
         "",
         "## 检查结果",
         "",
@@ -388,7 +428,7 @@ def main() -> int:
             "",
             "## 结论",
             "",
-            "- 论文正文、审稿回复、逐条修改说明、最终一致性核验和 Word 稿均已写入最终三指标、无泄露协议、现代强基线全指标支配、配对预测审计和配对统计审计证据。",
+            "- 论文正文、审稿回复、逐条修改说明、最终一致性核验和 Word 稿均已写入最终三指标、无泄露协议、现代强基线全指标支配、配对预测审计、配对统计审计和压力场景审计证据。",
             "- 文稿保留了必要边界：Traffic 只作为重构小时级窗口和周期特征后的结构鲁棒性初步验证，不作为稳定跨域泛化证明；配对预测审计作为补充证据，不替换原现代强基线主表。",
             "- 当前结论限定在南京南站双向日粒度客流、当前时间顺序划分和当前对比模型集合下。",
         ]
