@@ -31,22 +31,22 @@
       "name": "paper_docx_copy_synced",
       "passed": true,
       "detail": {
-        "main": "e3968c400a0a0efe0f38f314b64abed0c2e46fefabba73431907c9923eaa178b",
-        "copy": "e3968c400a0a0efe0f38f314b64abed0c2e46fefabba73431907c9923eaa178b"
+        "main": "6643523d4f00de5e895287a7629b05d300992d9a0928a703e2395b5b1277fe2a",
+        "copy": "6643523d4f00de5e895287a7629b05d300992d9a0928a703e2395b5b1277fe2a"
       }
     },
     {
       "name": "paper_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 664,
+        "runs": 666,
         "fonts": {
-          "Times New Roman": 664
+          "Times New Roman": 666
         },
         "east_asia": {
-          "STSong": 664
+          "STSong": 666
         },
-        "paragraphs": 224,
+        "paragraphs": 230,
         "tables": 11
       }
     },
@@ -54,14 +54,14 @@
       "name": "response_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 143,
+        "runs": 144,
         "fonts": {
-          "Times New Roman": 143
+          "Times New Roman": 144
         },
         "east_asia": {
-          "STSong": 143
+          "STSong": 144
         },
-        "paragraphs": 86,
+        "paragraphs": 88,
         "tables": 0
       }
     },
@@ -174,6 +174,17 @@
         "n_rows": 212,
         "n_targets": 20,
         "bootstrap_samples": 2000
+      }
+    },
+    {
+      "name": "modern_baseline_dominance_audit",
+      "passed": true,
+      "detail": {
+        "point_dominance_cells": 15,
+        "point_dominance_total_cells": 15,
+        "ci95_upper_below_cells": 10,
+        "closest_baseline": "FreEformer",
+        "minimum_relative_reduction_pct": 6.825446197931193
       }
     },
     {

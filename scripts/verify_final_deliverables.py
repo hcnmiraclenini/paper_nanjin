@@ -56,6 +56,7 @@ REQUIRED_FILES = [
     "docs/experiments/审稿意见完成度审计_20260701.md",
     "docs/experiments/固定消融套件复核_20260701.md",
     "docs/experiments/现代强基线优势边界审计_20260701.md",
+    "docs/experiments/现代强基线全指标支配审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/流量分层误差审计_20260701.md",
     "docs/experiments/Regime门控对齐审计_20260701.md",
@@ -65,6 +66,9 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/modern_baselines_correct_data_20260701.json",
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.csv",
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.json",
+    "docs/experiments/artifacts/modern_baseline_dominance_audit_20260701.csv",
+    "docs/experiments/artifacts/modern_baseline_dominance_audit_20260701.json",
+    "docs/experiments/figures/modern_baseline_all_metrics_20260701.png",
     "docs/experiments/artifacts/target_error_profile_20260701.csv",
     "docs/experiments/artifacts/target_error_profile_20260701.json",
     "docs/experiments/artifacts/flow_stratified_error_audit_20260701.csv",
@@ -297,6 +301,32 @@ def main() -> int:
         },
     )
 
+    dominance = json.loads(
+        (ROOT / "docs/experiments/artifacts/modern_baseline_dominance_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    dominance_ok = (
+        dominance["point_dominance_cells"] == 15
+        and dominance["point_dominance_total_cells"] == 15
+        and dominance["all_baselines_all_three_point_better"] is True
+        and dominance["ci95_upper_below_cells"] == 10
+        and dominance["closest_baseline_by_minimum_relative_reduction"] == "FreEformer"
+        and dominance["minimum_relative_reduction_pct"] > 6.8
+    )
+    add_check(
+        checks,
+        "modern_baseline_dominance_audit",
+        dominance_ok,
+        {
+            "point_dominance_cells": dominance["point_dominance_cells"],
+            "point_dominance_total_cells": dominance["point_dominance_total_cells"],
+            "ci95_upper_below_cells": dominance["ci95_upper_below_cells"],
+            "closest_baseline": dominance["closest_baseline_by_minimum_relative_reduction"],
+            "minimum_relative_reduction_pct": dominance["minimum_relative_reduction_pct"],
+        },
+    )
+
     profile = json.loads(
         (ROOT / "docs/experiments/artifacts/target_error_profile_20260701.json").read_text(encoding="utf-8")
     )
@@ -398,6 +428,7 @@ def main() -> int:
         ROOT / "docs/experiments/最终一致性核验_20260701.md",
         ROOT / "docs/experiments/审稿意见完成度审计_20260701.md",
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
+        ROOT / "docs/experiments/现代强基线全指标支配审计_20260701.md",
         ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
         ROOT / "docs/experiments/流量分层误差审计_20260701.md",
         ROOT / "docs/experiments/Regime门控对齐审计_20260701.md",
@@ -416,6 +447,7 @@ def main() -> int:
         "data/from_nj.csv",
         "data/to_nj.csv",
         "现代强基线优势边界审计_20260701.md",
+        "现代强基线全指标支配审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
         "流量分层误差审计_20260701.md",
         "Regime门控对齐审计_20260701.md",
@@ -449,6 +481,7 @@ def main() -> int:
             "- 论文 Word 和审稿回复 Word 字体均统一为 Times New Roman + STSong。",
             "- Strict RAMR-VE 最终三项指标均优于原 MoE-Rail 阈值。",
             "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
+            "- 现代强基线全指标支配审计显示 15/15 个 MAPE/MSE/MAE 点估计比较单元均优于现代基线。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",
             "- Regime 门控对齐审计显示高频日总波动更多激活短期专家、峰均比突发强度更多激活分布偏移专家。",
