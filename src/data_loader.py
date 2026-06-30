@@ -416,7 +416,8 @@ def prepare_data(
     test_ratio=0.25,
     batch_size=32,
     num_workers=4,
-    use_both=True  # 是否同时使用from和to（True=20个变量，False=只使用from，10个变量）
+    use_both=True,  # 是否同时使用from和to（True=20个变量，False=只使用from，10个变量）
+    fit_scaler_on_full_data=False,
 ):
     """
     准备数据并创建DataLoader
@@ -447,18 +448,27 @@ def prepare_data(
     scene_features, date_index = build_calendar_features(all_dates)
     
     target_data = merged_df[target_cols].values
-    
-    scaler = RobustScaler()
-    target_data_scaled = scaler.fit_transform(target_data)
-    
+
     # 按时间顺序划分数据集
-    total_len = len(target_data_scaled)
+    total_len = len(target_data)
     train_end = int(total_len * train_ratio)
     val_end = int(total_len * (train_ratio + val_ratio))
-    
-    train_data = target_data_scaled[:train_end]
-    val_data = target_data_scaled[train_end:val_end]
-    test_data = target_data_scaled[val_end:]
+
+    raw_train_data = target_data[:train_end]
+    raw_val_data = target_data[train_end:val_end]
+    raw_test_data = target_data[val_end:]
+
+    scaler = RobustScaler()
+    if fit_scaler_on_full_data:
+        print("  [WARNING] RobustScaler 使用全量数据拟合，仅用于旧实验复现；严格测试请关闭该选项。")
+        scaler.fit(target_data)
+    else:
+        print("  [INFO] RobustScaler 仅使用训练集拟合，避免验证/测试分布泄露。")
+        scaler.fit(raw_train_data)
+
+    train_data = scaler.transform(raw_train_data)
+    val_data = scaler.transform(raw_val_data)
+    test_data = scaler.transform(raw_test_data)
     
     train_scene = scene_features[:train_end]
     val_scene = scene_features[train_end:val_end]
@@ -533,4 +543,3 @@ def prepare_data(
     }
     
     return train_loader, val_loader, test_loader, scaler, dataset_info
-
