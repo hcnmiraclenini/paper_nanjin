@@ -1,0 +1,268 @@
+{
+  "passed": true,
+  "protocol": "Paired post-hoc audit only. Baseline predictions are loaded from a validation-selected modern-baseline rerun with exported predictions; this script performs no training, checkpoint selection, tuning, or calibration.",
+  "ramr_prediction_file": "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
+  "baseline_prediction_dir": "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701",
+  "n_rows": 212,
+  "n_targets": 20,
+  "bootstrap_samples": 2000,
+  "seed": 42,
+  "ramr_point": {
+    "mape": 18.546323040648975,
+    "mse": 0.035640054881848904,
+    "mae": 0.13802760334469663,
+    "valid_count": 4240,
+    "ignored_count": 0
+  },
+  "rows": [
+    {
+      "baseline": "DLinear",
+      "baseline_mape": 24.191367626190186,
+      "baseline_mse": 0.05428245067519333,
+      "baseline_mae": 0.1826079850174714,
+      "ramr_mape": 18.546323040648975,
+      "ramr_mse": 0.035640054881848904,
+      "ramr_mae": 0.13802760334469663,
+      "mape_margin": 5.645044585541211,
+      "mse_margin": 0.018642395793344424,
+      "mae_margin": 0.04458038167277478,
+      "mape_prob_ramr_better": 1.0,
+      "mse_prob_ramr_better": 1.0,
+      "mae_prob_ramr_better": 1.0,
+      "all_three_prob_ramr_better": 1.0
+    },
+    {
+      "baseline": "FreEformer",
+      "baseline_mape": 22.604434192180634,
+      "baseline_mse": 0.044534127587090695,
+      "baseline_mae": 0.1592583848324032,
+      "ramr_mape": 18.546323040648975,
+      "ramr_mse": 0.035640054881848904,
+      "ramr_mae": 0.13802760334469663,
+      "mape_margin": 4.058111151531659,
+      "mse_margin": 0.008894072705241791,
+      "mae_margin": 0.021230781487706574,
+      "mape_prob_ramr_better": 1.0,
+      "mse_prob_ramr_better": 1.0,
+      "mae_prob_ramr_better": 1.0,
+      "all_three_prob_ramr_better": 1.0
+    },
+    {
+      "baseline": "PatchTST",
+      "baseline_mape": 28.288650512695312,
+      "baseline_mse": 0.0590790387913371,
+      "baseline_mae": 0.18232625341112405,
+      "ramr_mape": 18.546323040648975,
+      "ramr_mse": 0.035640054881848904,
+      "ramr_mae": 0.13802760334469663,
+      "mape_margin": 9.742327472046338,
+      "mse_margin": 0.023438983909488197,
+      "mae_margin": 0.044298650066427414,
+      "mape_prob_ramr_better": 1.0,
+      "mse_prob_ramr_better": 1.0,
+      "mae_prob_ramr_better": 1.0,
+      "all_three_prob_ramr_better": 1.0
+    },
+    {
+      "baseline": "TimeMixer",
+      "baseline_mape": 24.483714997768402,
+      "baseline_mse": 0.038867226811814204,
+      "baseline_mae": 0.1525686276773129,
+      "ramr_mape": 18.546323040648975,
+      "ramr_mse": 0.035640054881848904,
+      "ramr_mae": 0.13802760334469663,
+      "mape_margin": 5.937391957119427,
+      "mse_margin": 0.0032271719299653,
+      "mae_margin": 0.014541024332616281,
+      "mape_prob_ramr_better": 1.0,
+      "mse_prob_ramr_better": 0.894,
+      "mae_prob_ramr_better": 1.0,
+      "all_three_prob_ramr_better": 0.894
+    },
+    {
+      "baseline": "iTransformer",
+      "baseline_mape": 21.356631815433502,
+      "baseline_mse": 0.04764235152962891,
+      "baseline_mae": 0.16473049322487537,
+      "ramr_mape": 18.546323040648975,
+      "ramr_mse": 0.035640054881848904,
+      "ramr_mae": 0.13802760334469663,
+      "mape_margin": 2.8103087747845272,
+      "mse_margin": 0.012002296647780006,
+      "mae_margin": 0.026702889880178743,
+      "mape_prob_ramr_better": 1.0,
+      "mse_prob_ramr_better": 1.0,
+      "mae_prob_ramr_better": 1.0,
+      "all_three_prob_ramr_better": 1.0
+    }
+  ],
+  "details": [
+    {
+      "baseline": "DLinear",
+      "prediction_file": "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
+      "point": {
+        "mape": 24.191367626190186,
+        "mse": 0.05428245067519333,
+        "mae": 0.1826079850174714,
+        "valid_count": 4239,
+        "ignored_count": 1
+      },
+      "bootstrap": {
+        "mape": {
+          "mean_baseline_minus_ramr": 5.652207496407724,
+          "ci95_low": 4.462241620494619,
+          "ci95_high": 6.943510415500316,
+          "prob_ramr_better": 1.0
+        },
+        "mse": {
+          "mean_baseline_minus_ramr": 0.01857510064616214,
+          "ci95_low": 0.011877328652588578,
+          "ci95_high": 0.025078298132002845,
+          "prob_ramr_better": 1.0
+        },
+        "mae": {
+          "mean_baseline_minus_ramr": 0.04446680917296308,
+          "ci95_low": 0.03401113798971076,
+          "ci95_high": 0.05473298377753326,
+          "prob_ramr_better": 1.0
+        },
+        "prob_all_three_ramr_better": 1.0
+      }
+    },
+    {
+      "baseline": "FreEformer",
+      "prediction_file": "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/FreEformer_test_predictions.npz",
+      "point": {
+        "mape": 22.604434192180634,
+        "mse": 0.044534127587090695,
+        "mae": 0.1592583848324032,
+        "valid_count": 4222,
+        "ignored_count": 18
+      },
+      "bootstrap": {
+        "mape": {
+          "mean_baseline_minus_ramr": 4.0657183472246885,
+          "ci95_low": 2.8701481210718383,
+          "ci95_high": 5.191287495048898,
+          "prob_ramr_better": 1.0
+        },
+        "mse": {
+          "mean_baseline_minus_ramr": 0.008908806216014102,
+          "ci95_low": 0.004877102512821656,
+          "ci95_high": 0.013157261211531502,
+          "prob_ramr_better": 1.0
+        },
+        "mae": {
+          "mean_baseline_minus_ramr": 0.021235285865620526,
+          "ci95_low": 0.014700299064589141,
+          "ci95_high": 0.027913233065369556,
+          "prob_ramr_better": 1.0
+        },
+        "prob_all_three_ramr_better": 1.0
+      }
+    },
+    {
+      "baseline": "PatchTST",
+      "prediction_file": "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
+      "point": {
+        "mape": 28.288650512695312,
+        "mse": 0.0590790387913371,
+        "mae": 0.18232625341112405,
+        "valid_count": 4234,
+        "ignored_count": 6
+      },
+      "bootstrap": {
+        "mape": {
+          "mean_baseline_minus_ramr": 9.752877764794324,
+          "ci95_low": 8.191038352386215,
+          "ci95_high": 11.256932619054385,
+          "prob_ramr_better": 1.0
+        },
+        "mse": {
+          "mean_baseline_minus_ramr": 0.023376482929376618,
+          "ci95_low": 0.014315092937059577,
+          "ci95_high": 0.03239772438087957,
+          "prob_ramr_better": 1.0
+        },
+        "mae": {
+          "mean_baseline_minus_ramr": 0.04426398064262573,
+          "ci95_low": 0.03193725448229813,
+          "ci95_high": 0.05660848309446308,
+          "prob_ramr_better": 1.0
+        },
+        "prob_all_three_ramr_better": 1.0
+      }
+    },
+    {
+      "baseline": "TimeMixer",
+      "prediction_file": "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/TimeMixer_test_predictions.npz",
+      "point": {
+        "mape": 24.483714997768402,
+        "mse": 0.038867226811814204,
+        "mae": 0.1525686276773129,
+        "valid_count": 4238,
+        "ignored_count": 2
+      },
+      "bootstrap": {
+        "mape": {
+          "mean_baseline_minus_ramr": 5.94612882623384,
+          "ci95_low": 4.5944888851706285,
+          "ci95_high": 7.144698240181898,
+          "prob_ramr_better": 1.0
+        },
+        "mse": {
+          "mean_baseline_minus_ramr": 0.003131982920672876,
+          "ci95_low": -0.0020219551741372643,
+          "ci95_high": 0.007786578537809412,
+          "prob_ramr_better": 0.894
+        },
+        "mae": {
+          "mean_baseline_minus_ramr": 0.014406957133990313,
+          "ci95_low": 0.006498443861770094,
+          "ci95_high": 0.022079393825246738,
+          "prob_ramr_better": 1.0
+        },
+        "prob_all_three_ramr_better": 0.894
+      }
+    },
+    {
+      "baseline": "iTransformer",
+      "prediction_file": "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/iTransformer_test_predictions.npz",
+      "point": {
+        "mape": 21.356631815433502,
+        "mse": 0.04764235152962891,
+        "mae": 0.16473049322487537,
+        "valid_count": 4136,
+        "ignored_count": 104
+      },
+      "bootstrap": {
+        "mape": {
+          "mean_baseline_minus_ramr": 2.8169375892908337,
+          "ci95_low": 1.7996072022591116,
+          "ci95_high": 3.7706156361956884,
+          "prob_ramr_better": 1.0
+        },
+        "mse": {
+          "mean_baseline_minus_ramr": 0.01201175339419103,
+          "ci95_low": 0.0076197854994380495,
+          "ci95_high": 0.016518581924496976,
+          "prob_ramr_better": 1.0
+        },
+        "mae": {
+          "mean_baseline_minus_ramr": 0.026700016149884053,
+          "ci95_low": 0.01958949630111315,
+          "ci95_high": 0.03397234153052523,
+          "prob_ramr_better": 1.0
+        },
+        "prob_all_three_ramr_better": 1.0
+      }
+    }
+  ],
+  "summary": {
+    "point_dominance_cells": 15,
+    "point_dominance_total_cells": 15,
+    "min_all_three_prob": 0.894,
+    "max_all_three_prob": 1.0,
+    "closest_by_all_three_prob": "TimeMixer"
+  }
+}

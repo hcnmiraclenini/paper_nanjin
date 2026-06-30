@@ -56,6 +56,9 @@ python3 scripts/analyze_modern_baseline_margin.py
 # 现代强基线全指标支配审计
 python3 scripts/analyze_modern_baseline_dominance.py
 
+# 现代强基线配对预测审计
+python3 scripts/analyze_modern_baseline_paired.py
+
 # 站点方向误差剖面审计
 python3 scripts/analyze_target_error_profile.py
 
@@ -81,6 +84,7 @@ python3 scripts/analyze_regime_gate_alignment.py
 - 无泄露实验协议审计：`docs/experiments/无泄露实验协议审计_20260701.md`
 - 现代强基线优势边界：`docs/experiments/现代强基线优势边界审计_20260701.md`
 - 现代强基线全指标支配：`docs/experiments/现代强基线全指标支配审计_20260701.md`
+- 现代强基线配对预测审计：`docs/experiments/现代强基线配对预测审计_20260701.md`
 - 站点方向误差剖面：`docs/experiments/站点方向误差剖面审计_20260701.md`
 - 流量分层误差审计：`docs/experiments/流量分层误差审计_20260701.md`
 - Regime 门控对齐审计：`docs/experiments/Regime门控对齐审计_20260701.md`

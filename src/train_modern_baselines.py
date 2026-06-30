@@ -144,7 +144,7 @@ class FreEformerBaseline(nn.Module):
         return y.reshape(x.size(0), self.horizon * self.n_targets)
 
 
-def calculate_metrics(model, loader, device, scaler, n_targets, horizon):
+def collect_predictions(model, loader, device, scaler, n_targets):
     model.eval()
     preds = []
     targets = []
@@ -159,6 +159,10 @@ def calculate_metrics(model, loader, device, scaler, n_targets, horizon):
     preds_orig = scaler.inverse_transform(preds.reshape(-1, n_targets))
     targets_orig = scaler.inverse_transform(targets.reshape(-1, n_targets))
     preds_orig = np.clip(preds_orig, 0, None)
+    return preds_orig, targets_orig
+
+
+def metrics_from_arrays(preds_orig, targets_orig):
     mape, valid_count, ignored_count = mape_with_threshold(targets_orig.flatten(), preds_orig.flatten(), threshold=10.0)
     mse = np.sum((targets_orig - preds_orig) ** 2) / (np.sum(targets_orig ** 2) + 1e-8)
     mae = np.sum(np.abs(targets_orig - preds_orig)) / (np.sum(targets_orig) + 1e-8)
@@ -169,6 +173,11 @@ def calculate_metrics(model, loader, device, scaler, n_targets, horizon):
         "valid_count": int(valid_count),
         "ignored_count": int(ignored_count),
     }
+
+
+def calculate_metrics(model, loader, device, scaler, n_targets, horizon):
+    preds_orig, targets_orig = collect_predictions(model, loader, device, scaler, n_targets)
+    return metrics_from_arrays(preds_orig, targets_orig)
 
 
 def train_one(name, model, train_loader, val_loader, test_loader, scaler, n_targets, horizon, args, device):
@@ -208,7 +217,40 @@ def train_one(name, model, train_loader, val_loader, test_loader, scaler, n_targ
             break
 
     model.load_state_dict(best["state"])
-    test = calculate_metrics(model, test_loader, device, scaler, n_targets, horizon)
+    val_preds, val_targets = collect_predictions(model, val_loader, device, scaler, n_targets)
+    test_preds, test_targets = collect_predictions(model, test_loader, device, scaler, n_targets)
+    test = metrics_from_arrays(test_preds, test_targets)
+
+    if args.save_checkpoints:
+        ckpt_dir = Path(args.output_dir)
+        if not ckpt_dir.is_absolute():
+            ckpt_dir = Path.cwd() / ckpt_dir
+        ckpt_dir = ckpt_dir / "checkpoints"
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        torch.save(
+            {
+                "model": name,
+                "best_epoch": int(best["epoch"]),
+                "state_dict": best["state"],
+                "config": {
+                    "lookback": args.lookback,
+                    "horizon": args.horizon,
+                    "n_targets": n_targets,
+                    "hidden_dim": args.hidden_dim,
+                },
+            },
+            ckpt_dir / f"{name}.pth",
+        )
+
+    if args.save_predictions:
+        pred_dir = Path(args.output_dir)
+        if not pred_dir.is_absolute():
+            pred_dir = Path.cwd() / pred_dir
+        pred_dir = pred_dir / "predictions"
+        pred_dir.mkdir(parents=True, exist_ok=True)
+        np.savez_compressed(pred_dir / f"{name}_validation_predictions.npz", preds=val_preds, targets=val_targets)
+        np.savez_compressed(pred_dir / f"{name}_test_predictions.npz", preds=test_preds, targets=test_targets)
+
     return {
         "model": name,
         "best_epoch": int(best["epoch"]),
@@ -249,6 +291,8 @@ def main():
     parser.add_argument("--num_workers", type=int, default=4)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--log_every", type=int, default=10)
+    parser.add_argument("--save_predictions", action="store_true", help="Save validation/test predictions for paired audits.")
+    parser.add_argument("--save_checkpoints", action="store_true", help="Save validation-selected best checkpoint states.")
     args = parser.parse_args()
 
     set_seed(args.seed)

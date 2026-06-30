@@ -58,6 +58,7 @@ REQUIRED_FILES = [
     "docs/experiments/固定消融套件复核_20260701.md",
     "docs/experiments/现代强基线优势边界审计_20260701.md",
     "docs/experiments/现代强基线全指标支配审计_20260701.md",
+    "docs/experiments/现代强基线配对预测审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/流量分层误差审计_20260701.md",
     "docs/experiments/Regime门控对齐审计_20260701.md",
@@ -71,6 +72,13 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/modern_baseline_dominance_audit_20260701.csv",
     "docs/experiments/artifacts/modern_baseline_dominance_audit_20260701.json",
     "docs/experiments/figures/modern_baseline_all_metrics_20260701.png",
+    "docs/experiments/artifacts/modern_baseline_paired_audit_20260701.csv",
+    "docs/experiments/artifacts/modern_baseline_paired_audit_20260701.json",
+    "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
+    "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
+    "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/iTransformer_test_predictions.npz",
+    "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/TimeMixer_test_predictions.npz",
+    "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/FreEformer_test_predictions.npz",
     "docs/experiments/artifacts/target_error_profile_20260701.csv",
     "docs/experiments/artifacts/target_error_profile_20260701.json",
     "docs/experiments/artifacts/flow_stratified_error_audit_20260701.csv",
@@ -361,6 +369,33 @@ def main() -> int:
         },
     )
 
+    paired = json.loads(
+        (ROOT / "docs/experiments/artifacts/modern_baseline_paired_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    paired_ok = (
+        paired["passed"] is True
+        and paired["n_rows"] == 212
+        and paired["n_targets"] == 20
+        and paired["bootstrap_samples"] == 2000
+        and paired["summary"]["point_dominance_cells"] == 15
+        and paired["summary"]["point_dominance_total_cells"] == 15
+        and paired["summary"]["min_all_three_prob"] >= 0.89
+        and paired["summary"]["closest_by_all_three_prob"] == "TimeMixer"
+    )
+    add_check(
+        checks,
+        "modern_baseline_paired_audit",
+        paired_ok,
+        {
+            "point_dominance_cells": paired["summary"]["point_dominance_cells"],
+            "point_dominance_total_cells": paired["summary"]["point_dominance_total_cells"],
+            "min_all_three_prob": paired["summary"]["min_all_three_prob"],
+            "closest": paired["summary"]["closest_by_all_three_prob"],
+        },
+    )
+
     profile = json.loads(
         (ROOT / "docs/experiments/artifacts/target_error_profile_20260701.json").read_text(encoding="utf-8")
     )
@@ -464,6 +499,7 @@ def main() -> int:
         ROOT / "docs/experiments/无泄露实验协议审计_20260701.md",
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
         ROOT / "docs/experiments/现代强基线全指标支配审计_20260701.md",
+        ROOT / "docs/experiments/现代强基线配对预测审计_20260701.md",
         ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
         ROOT / "docs/experiments/流量分层误差审计_20260701.md",
         ROOT / "docs/experiments/Regime门控对齐审计_20260701.md",
@@ -484,6 +520,7 @@ def main() -> int:
         "无泄露实验协议审计_20260701.md",
         "现代强基线优势边界审计_20260701.md",
         "现代强基线全指标支配审计_20260701.md",
+        "现代强基线配对预测审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
         "流量分层误差审计_20260701.md",
         "Regime门控对齐审计_20260701.md",
@@ -519,6 +556,7 @@ def main() -> int:
             "- 无泄露实验协议审计确认时间顺序划分、训练集拟合 Scaler、窗口构造和固定测试预测行数均通过。",
             "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
             "- 现代强基线全指标支配审计显示 15/15 个 MAPE/MSE/MAE 点估计比较单元均优于现代基线。",
+            "- 现代强基线配对预测审计显示同一测试日期与目标变量下 15/15 个点估计比较单元均优，三指标同时更优的 bootstrap 概率最低为 89.40%。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",
             "- Regime 门控对齐审计显示高频日总波动更多激活短期专家、峰均比突发强度更多激活分布偏移专家。",
