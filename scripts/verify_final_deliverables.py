@@ -56,12 +56,15 @@ REQUIRED_FILES = [
     "docs/experiments/审稿意见完成度审计_20260701.md",
     "docs/experiments/固定消融套件复核_20260701.md",
     "docs/experiments/现代强基线优势边界审计_20260701.md",
+    "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/Word格式与表格一致性审计_20260701.md",
     "docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json",
     "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
     "docs/experiments/artifacts/modern_baselines_correct_data_20260701.json",
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.csv",
     "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.json",
+    "docs/experiments/artifacts/target_error_profile_20260701.csv",
+    "docs/experiments/artifacts/target_error_profile_20260701.json",
     "docs/experiments/artifacts/fixed_ablation_metrics_20260701.csv",
     "docs/experiments/artifacts/fixed_ablation_metrics_20260701.json",
 ]
@@ -288,6 +291,35 @@ def main() -> int:
         },
     )
 
+    profile = json.loads(
+        (ROOT / "docs/experiments/artifacts/target_error_profile_20260701.json").read_text(encoding="utf-8")
+    )
+    direction_metrics = {row["direction"]: row for row in profile["direction_metrics"]}
+    profile_ok = (
+        profile["n_rows"] == 212
+        and profile["n_targets"] == 20
+        and approx_equal(profile["overall"]["mape"], EXPECTED["final_mape"])
+        and approx_equal(profile["overall"]["mse"], EXPECTED["final_mse"])
+        and approx_equal(profile["overall"]["mae"], EXPECTED["final_mae"])
+        and set(direction_metrics) == {"from_nj", "to_nj"}
+        and direction_metrics["from_nj"]["mape"] < 20.0
+        and direction_metrics["to_nj"]["mape"] < 20.0
+        and profile["summary"]["targets_below_20_mape"] >= 16
+        and profile["summary"]["targets_below_30_mape"] >= 17
+    )
+    add_check(
+        checks,
+        "target_error_profile",
+        profile_ok,
+        {
+            "from_mape": direction_metrics.get("from_nj", {}).get("mape"),
+            "to_mape": direction_metrics.get("to_nj", {}).get("mape"),
+            "median_target_mape": profile["summary"].get("median_target_mape"),
+            "targets_below_20_mape": profile["summary"].get("targets_below_20_mape"),
+            "targets_below_30_mape": profile["summary"].get("targets_below_30_mape"),
+        },
+    )
+
     scan_files = [
         ROOT / "README.md",
         ROOT / "paper/论文终稿.md",
@@ -295,6 +327,7 @@ def main() -> int:
         ROOT / "docs/experiments/最终一致性核验_20260701.md",
         ROOT / "docs/experiments/审稿意见完成度审计_20260701.md",
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
+        ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
     ]
     banned_hits = scan_banned(scan_files)
     add_check(checks, "stale_phrase_scan", not banned_hits, banned_hits)
@@ -310,6 +343,7 @@ def main() -> int:
         "data/from_nj.csv",
         "data/to_nj.csv",
         "现代强基线优势边界审计_20260701.md",
+        "站点方向误差剖面审计_20260701.md",
     ]
     readme_missing = [item for item in readme_required if item not in readme]
     add_check(checks, "readme_final_entrypoints", not readme_missing, readme_missing)
@@ -340,6 +374,7 @@ def main() -> int:
             "- 论文 Word 和审稿回复 Word 字体均统一为 Times New Roman + STSong。",
             "- Strict RAMR-VE 最终三项指标均优于原 MoE-Rail 阈值。",
             "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
+            "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 固定消融套件和审稿回复覆盖检查通过。",
         ]
     )

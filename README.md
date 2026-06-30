@@ -49,6 +49,9 @@ python3 scripts/verify_final_deliverables.py
 
 # 现代强基线优势边界审计
 python3 scripts/analyze_modern_baseline_margin.py
+
+# 站点方向误差剖面审计
+python3 scripts/analyze_target_error_profile.py
 ```
 
 所有 `scripts/*.sh` 会自动 `source scripts/_env.sh`，工作目录为项目根目录。
@@ -64,6 +67,7 @@ python3 scripts/analyze_modern_baseline_margin.py
 - 最终一致性核验：`docs/experiments/最终一致性核验_20260701.md`
 - 自动核验报告：`docs/experiments/最终交付自动核验_20260701.md`
 - 现代强基线优势边界：`docs/experiments/现代强基线优势边界审计_20260701.md`
+- 站点方向误差剖面：`docs/experiments/站点方向误差剖面审计_20260701.md`
 
 ## 最终主结果
 
