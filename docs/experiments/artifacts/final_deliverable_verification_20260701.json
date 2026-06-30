@@ -31,22 +31,22 @@
       "name": "paper_docx_copy_synced",
       "passed": true,
       "detail": {
-        "main": "c700efacb0b9edd87d7efe6cd19e97c2d850a0441683eb4ee267a70bd5934d51",
-        "copy": "c700efacb0b9edd87d7efe6cd19e97c2d850a0441683eb4ee267a70bd5934d51"
+        "main": "d22e641ef1bbd31636956ea899d647b2a4e260ede50eb85f3786012aeb98e544",
+        "copy": "d22e641ef1bbd31636956ea899d647b2a4e260ede50eb85f3786012aeb98e544"
       }
     },
     {
       "name": "paper_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 660,
+        "runs": 661,
         "fonts": {
-          "Times New Roman": 660
+          "Times New Roman": 661
         },
         "east_asia": {
-          "STSong": 660
+          "STSong": 661
         },
-        "paragraphs": 220,
+        "paragraphs": 221,
         "tables": 11
       }
     },
@@ -54,14 +54,14 @@
       "name": "response_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 139,
+        "runs": 140,
         "fonts": {
-          "Times New Roman": 139
+          "Times New Roman": 140
         },
         "east_asia": {
-          "STSong": 139
+          "STSong": 140
         },
-        "paragraphs": 82,
+        "paragraphs": 83,
         "tables": 0
       }
     },
@@ -147,6 +147,34 @@
           "test_mae": 0.1642725975523204
         }
       ]
+    },
+    {
+      "name": "modern_baseline_margin_audit",
+      "passed": true,
+      "detail": {
+        "fre_eformer": {
+          "baseline": "FreEformer",
+          "baseline_mape": 20.153965055942535,
+          "baseline_mse": 0.040025995799741,
+          "baseline_mae": 0.14813873285393928,
+          "ramr_mape": 18.546323040648975,
+          "ramr_mse": 0.035640054881848904,
+          "ramr_mae": 0.13802760334469663,
+          "mape_absolute_margin": 1.6076420152935604,
+          "mse_absolute_margin": 0.0043859409178920936,
+          "mae_absolute_margin": 0.010111129509242645,
+          "mape_relative_reduction_pct": 7.976802633283995,
+          "mse_relative_reduction_pct": 10.95773092026476,
+          "mae_relative_reduction_pct": 6.825446197931193,
+          "bootstrap_prob_mape_below_baseline": 0.958,
+          "bootstrap_prob_mse_below_baseline": 0.852,
+          "bootstrap_prob_mae_below_baseline": 0.926,
+          "bootstrap_prob_all_below_baseline": 0.829
+        },
+        "n_rows": 212,
+        "n_targets": 20,
+        "bootstrap_samples": 2000
+      }
     },
     {
       "name": "stale_phrase_scan",

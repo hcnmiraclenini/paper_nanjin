@@ -55,8 +55,13 @@ REQUIRED_FILES = [
     "docs/experiments/最终一致性核验_20260701.md",
     "docs/experiments/审稿意见完成度审计_20260701.md",
     "docs/experiments/固定消融套件复核_20260701.md",
+    "docs/experiments/现代强基线优势边界审计_20260701.md",
     "docs/experiments/Word格式与表格一致性审计_20260701.md",
     "docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json",
+    "docs/experiments/artifacts/strict_ramr_ve_test_predictions_20260701.npz",
+    "docs/experiments/artifacts/modern_baselines_correct_data_20260701.json",
+    "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.csv",
+    "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.json",
     "docs/experiments/artifacts/fixed_ablation_metrics_20260701.csv",
     "docs/experiments/artifacts/fixed_ablation_metrics_20260701.json",
 ]
@@ -255,12 +260,41 @@ def main() -> int:
         ablation[["name", "test_mape", "test_mse", "test_mae"]].to_dict(orient="records"),
     )
 
+    margin = json.loads(
+        (ROOT / "docs/experiments/artifacts/modern_baseline_margin_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    fre = next((row for row in margin["baseline_margin_rows"] if row["baseline"] == "FreEformer"), None)
+    margin_ok = (
+        fre is not None
+        and fre["mape_absolute_margin"] > 0
+        and fre["mse_absolute_margin"] > 0
+        and fre["mae_absolute_margin"] > 0
+        and fre["bootstrap_prob_all_below_baseline"] >= 0.80
+        and margin["n_rows"] == 212
+        and margin["n_targets"] == 20
+        and margin["bootstrap_samples"] == 2000
+    )
+    add_check(
+        checks,
+        "modern_baseline_margin_audit",
+        margin_ok,
+        {
+            "fre_eformer": fre,
+            "n_rows": margin["n_rows"],
+            "n_targets": margin["n_targets"],
+            "bootstrap_samples": margin["bootstrap_samples"],
+        },
+    )
+
     scan_files = [
         ROOT / "README.md",
         ROOT / "paper/论文终稿.md",
         ROOT / "专家意见逐条修改说明.md",
         ROOT / "docs/experiments/最终一致性核验_20260701.md",
         ROOT / "docs/experiments/审稿意见完成度审计_20260701.md",
+        ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
     ]
     banned_hits = scan_banned(scan_files)
     add_check(checks, "stale_phrase_scan", not banned_hits, banned_hits)
@@ -275,6 +309,7 @@ def main() -> int:
         "0.138028",
         "data/from_nj.csv",
         "data/to_nj.csv",
+        "现代强基线优势边界审计_20260701.md",
     ]
     readme_missing = [item for item in readme_required if item not in readme]
     add_check(checks, "readme_final_entrypoints", not readme_missing, readme_missing)
@@ -304,6 +339,7 @@ def main() -> int:
             "- 两份 Word 论文文件内容完全一致。",
             "- 论文 Word 和审稿回复 Word 字体均统一为 Times New Roman + STSong。",
             "- Strict RAMR-VE 最终三项指标均优于原 MoE-Rail 阈值。",
+            "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
             "- 固定消融套件和审稿回复覆盖检查通过。",
         ]
     )

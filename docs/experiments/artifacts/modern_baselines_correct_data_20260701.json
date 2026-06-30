@@ -1,0 +1,42 @@
+[
+  {
+    "model": "DLinear",
+    "best_epoch": 160,
+    "val_mape": 40.56122004985809,
+    "test_mape": 24.343043565750122,
+    "test_mse": 0.05431416031986068,
+    "test_mae": 0.18245048901704872
+  },
+  {
+    "model": "PatchTST",
+    "best_epoch": 24,
+    "val_mape": 35.381510853767395,
+    "test_mape": 24.314039945602417,
+    "test_mse": 0.05485794169691043,
+    "test_mae": 0.17096280095599525
+  },
+  {
+    "model": "iTransformer",
+    "best_epoch": 27,
+    "val_mape": 36.28195524215698,
+    "test_mape": 21.371063590049744,
+    "test_mse": 0.04350613024471263,
+    "test_mae": 0.15433272270660348
+  },
+  {
+    "model": "TimeMixer",
+    "best_epoch": 49,
+    "val_mape": 32.510921359062195,
+    "test_mape": 23.547953367233276,
+    "test_mse": 0.042383958010442244,
+    "test_mae": 0.1598794884872624
+  },
+  {
+    "model": "FreEformer",
+    "best_epoch": 51,
+    "val_mape": 33.31328630447388,
+    "test_mape": 20.153965055942535,
+    "test_mse": 0.040025995799741,
+    "test_mae": 0.14813873285393928
+  }
+]
