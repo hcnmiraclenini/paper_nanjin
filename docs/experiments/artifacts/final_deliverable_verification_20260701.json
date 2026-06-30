@@ -31,8 +31,8 @@
       "name": "paper_docx_copy_synced",
       "passed": true,
       "detail": {
-        "main": "ba2e497fdd0cff3027d66ab9c1b42aa544cc2393104e948a3ace000d7dfc9a3a",
-        "copy": "ba2e497fdd0cff3027d66ab9c1b42aa544cc2393104e948a3ace000d7dfc9a3a"
+        "main": "fc94743c631fe6595a37614bcadca3377476541bdfa9549721234017605c035d",
+        "copy": "fc94743c631fe6595a37614bcadca3377476541bdfa9549721234017605c035d"
       }
     },
     {
@@ -54,14 +54,14 @@
       "name": "response_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 151,
+        "runs": 153,
         "fonts": {
-          "Times New Roman": 151
+          "Times New Roman": 153
         },
         "east_asia": {
-          "STSong": 151
+          "STSong": 153
         },
-        "paragraphs": 95,
+        "paragraphs": 97,
         "tables": 0
       }
     },
@@ -240,6 +240,15 @@
         "weekend_days": 60,
         "weekday_mape": 18.115317115530928,
         "weekend_mape": 19.638204715187232
+      }
+    },
+    {
+      "name": "traffic_boundary_audit",
+      "passed": true,
+      "detail": {
+        "raw_candidates": 0,
+        "boundary_texts": true,
+        "overclaim_scan": true
       }
     },
     {

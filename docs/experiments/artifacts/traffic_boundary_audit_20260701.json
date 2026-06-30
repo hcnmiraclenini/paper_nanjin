@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "protocol": "Read-only audit. It scans the workspace for raw Traffic data artifacts and checks manuscript wording boundaries. It performs no model training, tuning, or test-set evaluation.",
+  "workspace": ".",
+  "raw_suffixes": [
+    ".csv",
+    ".h5",
+    ".hdf",
+    ".hdf5",
+    ".npy",
+    ".npz",
+    ".parquet",
+    ".pkl"
+  ],
+  "raw_traffic_candidates": [],
+  "checks": [
+    {
+      "name": "no_raw_traffic_data_artifact_found",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "traffic_boundary_written_in_core_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "traffic_overclaim_phrase_scan",
+      "passed": true,
+      "detail": {}
+    }
+  ]
+}

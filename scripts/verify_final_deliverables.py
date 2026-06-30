@@ -62,6 +62,7 @@ REQUIRED_FILES = [
     "docs/experiments/现代强基线配对显著性审计_20260701.md",
     "docs/experiments/高需求高波动压力场景审计_20260701.md",
     "docs/experiments/场景分层现代强基线审计_20260701.md",
+    "docs/experiments/Traffic跨粒度边界自动审计_20260701.md",
     "docs/experiments/论文数值与口径一致性审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/流量分层误差审计_20260701.md",
@@ -84,6 +85,7 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/event_stress_baseline_audit_20260701.json",
     "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.csv",
     "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.json",
+    "docs/experiments/artifacts/traffic_boundary_audit_20260701.json",
     "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
@@ -497,6 +499,29 @@ def main() -> int:
         },
     )
 
+    traffic_boundary = json.loads(
+        (ROOT / "docs/experiments/artifacts/traffic_boundary_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    traffic_checks = {item["name"]: item for item in traffic_boundary["checks"]}
+    traffic_ok = (
+        traffic_boundary["passed"] is True
+        and traffic_checks["no_raw_traffic_data_artifact_found"]["passed"] is True
+        and traffic_checks["traffic_boundary_written_in_core_texts"]["passed"] is True
+        and traffic_checks["traffic_overclaim_phrase_scan"]["passed"] is True
+    )
+    add_check(
+        checks,
+        "traffic_boundary_audit",
+        traffic_ok,
+        {
+            "raw_candidates": len(traffic_boundary["raw_traffic_candidates"]),
+            "boundary_texts": traffic_checks["traffic_boundary_written_in_core_texts"]["passed"],
+            "overclaim_scan": traffic_checks["traffic_overclaim_phrase_scan"]["passed"],
+        },
+    )
+
     text_claim = json.loads(
         (ROOT / "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json").read_text(
             encoding="utf-8"
@@ -625,6 +650,7 @@ def main() -> int:
         ROOT / "docs/experiments/现代强基线配对显著性审计_20260701.md",
         ROOT / "docs/experiments/高需求高波动压力场景审计_20260701.md",
         ROOT / "docs/experiments/场景分层现代强基线审计_20260701.md",
+        ROOT / "docs/experiments/Traffic跨粒度边界自动审计_20260701.md",
         ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
         ROOT / "docs/experiments/流量分层误差审计_20260701.md",
         ROOT / "docs/experiments/Regime门控对齐审计_20260701.md",
@@ -649,6 +675,7 @@ def main() -> int:
         "现代强基线配对显著性审计_20260701.md",
         "高需求高波动压力场景审计_20260701.md",
         "场景分层现代强基线审计_20260701.md",
+        "Traffic跨粒度边界自动审计_20260701.md",
         "论文数值与口径一致性审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
         "流量分层误差审计_20260701.md",
@@ -689,6 +716,7 @@ def main() -> int:
             "- 现代强基线配对统计审计显示 15/15 个 Wilcoxon-Holm 单侧检验显著，并披露 TimeMixer-MSE 是 bootstrap/符号置换边界单元。",
             "- 高需求高波动压力场景审计显示高需求日三指标均优于现代强基线，并披露高日际变化日 MSE/MAE 的 TimeMixer 边界。",
             "- 场景分层现代强基线审计显示工作日和周末两类场景下 Strict RAMR-VE 三项指标均优于现代强基线，并披露当前测试窗口无节假日样本。",
+            "- Traffic 跨粒度边界自动审计确认当前仓库无可端到端复现的 Traffic 原始数据，并拦截过强跨域泛化表述。",
             "- 论文数值与口径一致性审计确认论文、审稿回复、逐条说明和 Word 稿中的关键数字与实验边界均已对齐权威 artifact。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",
