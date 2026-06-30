@@ -31,22 +31,22 @@
       "name": "paper_docx_copy_synced",
       "passed": true,
       "detail": {
-        "main": "8014f887371eef20bf65ea2d990c17b03168fc87e803bca1e7890039679aee3e",
-        "copy": "8014f887371eef20bf65ea2d990c17b03168fc87e803bca1e7890039679aee3e"
+        "main": "ba2e497fdd0cff3027d66ab9c1b42aa544cc2393104e948a3ace000d7dfc9a3a",
+        "copy": "ba2e497fdd0cff3027d66ab9c1b42aa544cc2393104e948a3ace000d7dfc9a3a"
       }
     },
     {
       "name": "paper_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 669,
+        "runs": 670,
         "fonts": {
-          "Times New Roman": 669
+          "Times New Roman": 670
         },
         "east_asia": {
-          "STSong": 669
+          "STSong": 670
         },
-        "paragraphs": 233,
+        "paragraphs": 234,
         "tables": 11
       }
     },
@@ -54,14 +54,14 @@
       "name": "response_word_fonts",
       "passed": true,
       "detail": {
-        "runs": 149,
+        "runs": 151,
         "fonts": {
-          "Times New Roman": 149
+          "Times New Roman": 151
         },
         "east_asia": {
-          "STSong": 149
+          "STSong": 151
         },
-        "paragraphs": 93,
+        "paragraphs": 95,
         "tables": 0
       }
     },
@@ -233,11 +233,21 @@
       }
     },
     {
+      "name": "scene_baseline_stratification_audit",
+      "passed": true,
+      "detail": {
+        "weekday_days": 152,
+        "weekend_days": 60,
+        "weekday_mape": 18.115317115530928,
+        "weekend_mape": 19.638204715187232
+      }
+    },
+    {
       "name": "text_claim_consistency_audit",
       "passed": true,
       "detail": {
         "passed": true,
-        "check_count": 16
+        "check_count": 18
       }
     },
     {

@@ -61,6 +61,7 @@ REQUIRED_FILES = [
     "docs/experiments/现代强基线配对预测审计_20260701.md",
     "docs/experiments/现代强基线配对显著性审计_20260701.md",
     "docs/experiments/高需求高波动压力场景审计_20260701.md",
+    "docs/experiments/场景分层现代强基线审计_20260701.md",
     "docs/experiments/论文数值与口径一致性审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/流量分层误差审计_20260701.md",
@@ -81,6 +82,8 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/paired_significance_audit_20260701.json",
     "docs/experiments/artifacts/event_stress_baseline_audit_20260701.csv",
     "docs/experiments/artifacts/event_stress_baseline_audit_20260701.json",
+    "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.csv",
+    "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.json",
     "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
@@ -463,6 +466,37 @@ def main() -> int:
         },
     )
 
+    scene = json.loads(
+        (ROOT / "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    scene_summary = scene["summary"]
+    scene_ok = (
+        scene["passed"] is True
+        and scene["n_dates"] == 212
+        and scene["n_targets"] == 20
+        and scene["test_start_index"] == 634
+        and scene["scene_counts"]["weekday"] == 152
+        and scene["scene_counts"]["weekend"] == 60
+        and scene["scene_counts"]["holiday"] == 0
+        and scene_summary["weekday_ramr_best_all_metrics"] is True
+        and scene_summary["weekend_ramr_best_all_metrics"] is True
+        and round(scene_summary["weekday_ramr_metrics"]["mape"], 4) == 18.1153
+        and round(scene_summary["weekend_ramr_metrics"]["mape"], 4) == 19.6382
+    )
+    add_check(
+        checks,
+        "scene_baseline_stratification_audit",
+        scene_ok,
+        {
+            "weekday_days": scene["scene_counts"]["weekday"],
+            "weekend_days": scene["scene_counts"]["weekend"],
+            "weekday_mape": scene_summary["weekday_ramr_metrics"]["mape"],
+            "weekend_mape": scene_summary["weekend_ramr_metrics"]["mape"],
+        },
+    )
+
     text_claim = json.loads(
         (ROOT / "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json").read_text(
             encoding="utf-8"
@@ -588,6 +622,9 @@ def main() -> int:
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
         ROOT / "docs/experiments/现代强基线全指标支配审计_20260701.md",
         ROOT / "docs/experiments/现代强基线配对预测审计_20260701.md",
+        ROOT / "docs/experiments/现代强基线配对显著性审计_20260701.md",
+        ROOT / "docs/experiments/高需求高波动压力场景审计_20260701.md",
+        ROOT / "docs/experiments/场景分层现代强基线审计_20260701.md",
         ROOT / "docs/experiments/站点方向误差剖面审计_20260701.md",
         ROOT / "docs/experiments/流量分层误差审计_20260701.md",
         ROOT / "docs/experiments/Regime门控对齐审计_20260701.md",
@@ -611,6 +648,7 @@ def main() -> int:
         "现代强基线配对预测审计_20260701.md",
         "现代强基线配对显著性审计_20260701.md",
         "高需求高波动压力场景审计_20260701.md",
+        "场景分层现代强基线审计_20260701.md",
         "论文数值与口径一致性审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
         "流量分层误差审计_20260701.md",
@@ -650,6 +688,7 @@ def main() -> int:
             "- 现代强基线配对预测审计显示同一测试日期与目标变量下 15/15 个点估计比较单元均优，三指标同时更优的 bootstrap 概率最低为 89.40%。",
             "- 现代强基线配对统计审计显示 15/15 个 Wilcoxon-Holm 单侧检验显著，并披露 TimeMixer-MSE 是 bootstrap/符号置换边界单元。",
             "- 高需求高波动压力场景审计显示高需求日三指标均优于现代强基线，并披露高日际变化日 MSE/MAE 的 TimeMixer 边界。",
+            "- 场景分层现代强基线审计显示工作日和周末两类场景下 Strict RAMR-VE 三项指标均优于现代强基线，并披露当前测试窗口无节假日样本。",
             "- 论文数值与口径一致性审计确认论文、审稿回复、逐条说明和 Word 稿中的关键数字与实验边界均已对齐权威 artifact。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",

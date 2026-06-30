@@ -91,6 +91,17 @@
       }
     },
     {
+      "name": "authoritative_scene_baseline_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "weekday_days": 152,
+        "weekend_days": 60,
+        "holiday_days": 0,
+        "weekday_mape": 18.115317115530928,
+        "weekend_mape": 19.638204715187232
+      }
+    },
+    {
       "name": "final_metrics_written_in_core_texts",
       "passed": true,
       "detail": {}
@@ -112,6 +123,11 @@
     },
     {
       "name": "event_stress_claims_written_in_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "scene_baseline_claims_written_in_texts",
       "passed": true,
       "detail": {}
     },

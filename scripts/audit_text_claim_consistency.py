@@ -120,6 +120,7 @@ def main() -> int:
     paired = read_json(ARTIFACT_DIR / "modern_baseline_paired_audit_20260701.json")
     paired_sig = read_json(ARTIFACT_DIR / "paired_significance_audit_20260701.json")
     event_stress = read_json(ARTIFACT_DIR / "event_stress_baseline_audit_20260701.json")
+    scene_baseline = read_json(ARTIFACT_DIR / "scene_baseline_stratification_audit_20260701.json")
     target_profile = read_json(ARTIFACT_DIR / "target_error_profile_20260701.json")
     flow = read_json(ARTIFACT_DIR / "flow_stratified_error_audit_20260701.json")
     regime = read_json(ARTIFACT_DIR / "regime_gate_alignment_audit_20260701.json")
@@ -252,6 +253,33 @@ def main() -> int:
         },
     )
 
+    scene_summary = scene_baseline["summary"]
+    scene_ok = (
+        scene_baseline["passed"] is True
+        and scene_baseline["n_dates"] == 212
+        and scene_baseline["n_targets"] == 20
+        and scene_baseline["test_start_index"] == 634
+        and scene_baseline["scene_counts"]["weekday"] == 152
+        and scene_baseline["scene_counts"]["weekend"] == 60
+        and scene_baseline["scene_counts"]["holiday"] == 0
+        and scene_summary["weekday_ramr_best_all_metrics"] is True
+        and scene_summary["weekend_ramr_best_all_metrics"] is True
+        and round(scene_summary["weekday_ramr_metrics"]["mape"], 4) == 18.1153
+        and round(scene_summary["weekend_ramr_metrics"]["mape"], 4) == 19.6382
+    )
+    add_check(
+        checks,
+        "authoritative_scene_baseline_artifact_loaded",
+        scene_ok,
+        {
+            "weekday_days": scene_baseline["scene_counts"]["weekday"],
+            "weekend_days": scene_baseline["scene_counts"]["weekend"],
+            "holiday_days": scene_baseline["scene_counts"]["holiday"],
+            "weekday_mape": scene_summary["weekday_ramr_metrics"]["mape"],
+            "weekend_mape": scene_summary["weekend_ramr_metrics"]["mape"],
+        },
+    )
+
     core_metric_needles = ["18.5463", "0.035640", "0.138028"]
     core_docs = ["readme", "paper_md", "response_md", "expert_response_md", "final_consistency_md", "paper_docx"]
     metric_missing = {
@@ -313,6 +341,21 @@ def main() -> int:
     }
     event_missing = {name: miss for name, miss in event_missing.items() if miss}
     add_check(checks, "event_stress_claims_written_in_texts", not event_missing, event_missing)
+
+    scene_groups = [
+        ("场景分层", ["场景分层"]),
+        ("工作日", ["工作日"]),
+        ("周末", ["周末"]),
+        ("18.1153", ["18.1153"]),
+        ("19.6382", ["19.6382"]),
+        ("节假日", ["节假日"]),
+    ]
+    scene_docs = ["readme", "paper_md", "response_md", "expert_response_md", "final_consistency_md", "paper_docx", "response_docx"]
+    scene_missing = {
+        name: missing_groups(texts[name], scene_groups) for name in scene_docs
+    }
+    scene_missing = {name: miss for name, miss in scene_missing.items() if miss}
+    add_check(checks, "scene_baseline_claims_written_in_texts", not scene_missing, scene_missing)
 
     boundary_groups = [
         ("结构鲁棒", ["结构鲁棒"]),
@@ -407,6 +450,7 @@ def main() -> int:
         f"- 现代强基线配对预测审计：{paired['summary']['point_dominance_cells']}/{paired['summary']['point_dominance_total_cells']} 个点估计比较单元更低，三指标同时更优的日期级 bootstrap 概率最低为 {paired['summary']['min_all_three_prob'] * 100:.2f}%，最接近边界为 {paired['summary']['closest_by_all_three_prob']}。",
         f"- 现代强基线配对统计审计：{paired_sig_summary['wilcoxon_holm_significant_0_01_cells']}/{paired_sig_summary['total_cells']} 个 Wilcoxon-Holm 单侧检验在 α=0.01 下显著，bootstrap/符号置换边界单元为 TimeMixer-MSE。",
         f"- 高需求/高波动压力审计：高需求日 Strict RAMR-VE 三指标均优于现代强基线；高日际变化日 MAPE 最优，但 MSE/MAE 边界模型为 TimeMixer。",
+        f"- 场景分层现代强基线审计：工作日 {scene_baseline['scene_counts']['weekday']} 天、周末 {scene_baseline['scene_counts']['weekend']} 天上 Strict RAMR-VE 三指标均最优；节假日样本数为 {scene_baseline['scene_counts']['holiday']}。",
         "",
         "## 检查结果",
         "",
@@ -428,7 +472,7 @@ def main() -> int:
             "",
             "## 结论",
             "",
-            "- 论文正文、审稿回复、逐条修改说明、最终一致性核验和 Word 稿均已写入最终三指标、无泄露协议、现代强基线全指标支配、配对预测审计、配对统计审计和压力场景审计证据。",
+            "- 论文正文、审稿回复、逐条修改说明、最终一致性核验和 Word 稿均已写入最终三指标、无泄露协议、现代强基线全指标支配、配对预测审计、配对统计审计、压力场景审计和场景分层审计证据。",
             "- 文稿保留了必要边界：Traffic 只作为重构小时级窗口和周期特征后的结构鲁棒性初步验证，不作为稳定跨域泛化证明；配对预测审计作为补充证据，不替换原现代强基线主表。",
             "- 当前结论限定在南京南站双向日粒度客流、当前时间顺序划分和当前对比模型集合下。",
         ]
