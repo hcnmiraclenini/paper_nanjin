@@ -1,5 +1,5 @@
 #!/bin/bash
-# 在测试集上评估所有快照，对比 2024-12-08 目标结果
+# 按验证集评估所有快照，对比 2024-12-08 目标结果；不访问测试集
 source "$(dirname "$0")/_env.sh"
 
 TARGET_BASELINE=19.41
@@ -23,7 +23,7 @@ declare -A TARGETS=(
 
 OUT="../results/reproduce_ablation_20241208_summary.txt"
 mkdir -p ../results
-echo "消融复现 — 测试集选模结果 $(date)" | tee "$OUT"
+echo "消融复现 — 验证集选模结果 $(date)" | tee "$OUT"
 echo "目标: baseline=${TARGET_BASELINE}% no_stat=${TARGET_NO_STAT}% no_long=${TARGET_NO_LONG}% no_short=${TARGET_NO_SHORT}%" | tee -a "$OUT"
 echo "========================================" | tee -a "$OUT"
 
@@ -36,5 +36,5 @@ for mode in baseline no_statistic no_longterm no_shortterm; do
 done
 
 echo "" | tee -a "$OUT"
-echo "完整排名见各目录下 test_mape_ranking.txt" | tee -a "$OUT"
+echo "完整排名见各目录下 validation_mape_ranking.txt" | tee -a "$OUT"
 echo "汇总已保存: $OUT"

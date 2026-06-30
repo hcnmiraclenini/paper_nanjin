@@ -499,7 +499,7 @@ def main():
     parser.add_argument('--balance_mode', type=str, default='entropy', choices=['entropy', 'variance'],
                         help='负载均衡: entropy=高熵专家使用约束, variance=平均权重方差约束')
     parser.add_argument('--snapshot_every', type=int, default=5,
-                        help='每 N 个 epoch 保存测试集选模用快照（不删除，默认5）')
+                        help='每 N 个 epoch 保存诊断快照（默认5；论文选模仍按验证集）')
     parser.add_argument('--max_keep_models', type=int, default=30,
                         help='按验证集保留的 best 模型数量（默认30）')
     
@@ -800,7 +800,7 @@ def main():
     # 维护最好的5个模型列表 (mape, epoch, filepath)
     best_models = []
     max_keep_models = args.max_keep_models
-    snap_dir = save_dir / 'snapshots_for_test'
+    snap_dir = save_dir / 'snapshots_for_diagnostics'
     if args.snapshot_every > 0:
         snap_dir.mkdir(parents=True, exist_ok=True)
     
@@ -809,7 +809,7 @@ def main():
     print(f"保存目录: {save_dir}")
     print(f"将保留最好的 {max_keep_models} 个模型（按验证集）")
     if args.snapshot_every > 0:
-        print(f"每 {args.snapshot_every} epoch 保存测试选模快照 -> {snap_dir}")
+        print(f"每 {args.snapshot_every} epoch 保存诊断快照 -> {snap_dir}")
     if args.resume:
         print(f"从Epoch {start_epoch}继续训练（总共 {args.num_epochs} 个epoch）")
     
@@ -994,7 +994,7 @@ def main():
             print(f"  [SAVE] 保存模型: {best_model_path.name}")
             print(f"  [KEEP] 当前保留 {len(best_models)}/{max_keep_models} 个最佳模型")
         
-        # 定期快照：供在测试集上选最优 epoch（原文 Epoch47 做法）
+        # 定期快照：仅供训练诊断或历史复现；论文选模必须使用验证集。
         if args.snapshot_every > 0 and (epoch % args.snapshot_every == 0):
             snap_ckpt = {
                 'epoch': epoch,
@@ -1023,7 +1023,7 @@ def main():
                 snap_ckpt['scaler_state_dict'] = amp_scaler.state_dict()
             snap_path = snap_dir / f'epoch_{epoch:03d}.pth'
             torch.save(snap_ckpt, snap_path)
-            print(f"  [SNAPSHOT] 测试选模快照: {snap_path.name} (val MAPE={val_results['mape']:.2f}%)")
+            print(f"  [SNAPSHOT] 诊断快照: {snap_path.name} (val MAPE={val_results['mape']:.2f}%)")
             
         # 早停检查
         if patience_counter >= args.patience:
@@ -1031,7 +1031,7 @@ def main():
             print(f"[STOP] 早停触发！")
             print(f"   ├─ 最佳Epoch: {best_epoch}")
             print(f"   └─ 最佳Val MAPE: {best_val_mape:.2f}%")
-            print(f"   提示: 请运行 eval_all_checkpoints.py 在测试集上选最优模型")
+            print(f"   提示: eval_all_checkpoints.py 默认按验证集排名；测试集只用于最终一次评估")
             print(f"{'='*80}\n")
             break
     

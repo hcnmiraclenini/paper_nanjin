@@ -36,7 +36,7 @@
 # 测试集评估
 python3 src/evaluate.py --checkpoint ../checkpoints/paper_experiments/demoe_full/best_model_latest.pth
 
-# 遍历目录选最优 checkpoint（复现 Epoch47 选模方式）
+# 遍历目录按验证集 MAPE 排名 checkpoint（不访问测试集）
 python3 src/eval_all_checkpoints.py --ckpt_dir ../checkpoints/moe_nanjin --target_mape 19.41
 
 # 生成论文配图
@@ -47,5 +47,5 @@ python3 src/plot_paper_figures.py \
 
 ## 说明
 
-- 各目录下的 `snapshots_for_test/epoch_*.pth` 为训练过程快照，体积大；**论文选模用 `best_model_epoch_*.pth` 或 `best_model_latest.pth` 即可**。
+- 新训练会将过程快照写入 `snapshots_for_diagnostics/epoch_*.pth`；历史遗留的 `snapshots_for_test/epoch_*.pth` 仅为旧命名兼容。**论文选模必须依据验证集指标，测试集只用于最终一次评估**。
 - Traffic 基准四步长（τ∈{96,192,336,720}）为泛化实验图表数据，非本仓库 checkpoint 训练产物。

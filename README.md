@@ -32,7 +32,7 @@ bash scripts/train.sh
 # 论文五组并行实验
 bash scripts/run_paper_experiments.sh
 
-# 测试集评估
+# 最终测试集评估（仅在模型/集成权重/尺度固定后运行一次）
 python3 src/evaluate.py \
   --checkpoint ../checkpoints/paper_experiments/demoe_full/best_model_latest.pth
 
