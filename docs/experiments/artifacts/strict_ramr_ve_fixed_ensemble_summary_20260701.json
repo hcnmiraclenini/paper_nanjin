@@ -1,0 +1,84 @@
+{
+  "protocol": "Fixed recipe export only: checkpoints, weights, and scale are loaded from validation-selected files.",
+  "weights_file": "/root/data3/huangchanni/moe/results/strict_no_leakage_ensemble/all_balanced_final_once/selected_weights.csv",
+  "summary_file": "/root/data3/huangchanni/moe/results/strict_no_leakage_ensemble/all_balanced_final_once/ensemble_summary.json",
+  "scale_selected_on_validation": 1.018,
+  "selection_metric": "balanced",
+  "bootstrap_unit": "test/validation date row with all target variables kept together",
+  "bootstrap_samples": 2000,
+  "seed": 42,
+  "validation": {
+    "metrics": {
+      "mape": 31.261160220388863,
+      "mse": 0.03237466762558899,
+      "mae": 0.12968421861502083,
+      "valid_count": 4220,
+      "ignored_count": 0
+    },
+    "bootstrap_ci": {
+      "mape": {
+        "mean": 30.99181173874844,
+        "std": 13.339522252077977,
+        "ci95_low": 15.99009053196992,
+        "ci95_high": 59.49654797138841
+      },
+      "mse": {
+        "mean": 0.032219650911492606,
+        "std": 0.0035701652252728483,
+        "ci95_low": 0.02574054991391829,
+        "ci95_high": 0.0393815108674013
+      },
+      "mae": {
+        "mean": 0.12938642768417963,
+        "std": 0.00672071023732593,
+        "ci95_low": 0.1167078115057874,
+        "ci95_high": 0.14301606812358472
+      }
+    },
+    "n_rows": 211,
+    "n_targets": 20,
+    "bootstrap_probability_below_baseline": {
+      "mape": 0.3335,
+      "mse": 0.925,
+      "mae": 0.985,
+      "all_metrics": 0.329
+    }
+  },
+  "test": {
+    "metrics": {
+      "mape": 18.546323040648975,
+      "mse": 0.035640054881848904,
+      "mae": 0.13802760334469663,
+      "valid_count": 4240,
+      "ignored_count": 0
+    },
+    "bootstrap_ci": {
+      "mape": {
+        "mean": 18.530345560219786,
+        "std": 0.9120601935580761,
+        "ci95_low": 16.87958772500778,
+        "ci95_high": 20.374305024357216
+      },
+      "mse": {
+        "mean": 0.03564652534397439,
+        "std": 0.004094823765885825,
+        "ci95_low": 0.028132500357103293,
+        "ci95_high": 0.04399125254929025
+      },
+      "mae": {
+        "mean": 0.1380551636389124,
+        "std": 0.006619049533909528,
+        "ci95_low": 0.12586048059768426,
+        "ci95_high": 0.1513790742760108
+      }
+    },
+    "n_rows": 212,
+    "n_targets": 20,
+    "bootstrap_probability_below_baseline": {
+      "mape": 0.831,
+      "mse": 0.698,
+      "mae": 0.815,
+      "all_metrics": 0.6315
+    }
+  }
+}
