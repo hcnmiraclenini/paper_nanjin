@@ -4,7 +4,7 @@ Post-Norm Transformer
 
 1. ShortTermExpert: GRU（短期依赖专家）
 2. LongTermExpert: Transformer（长期依赖专家，Post-Norm架构）
-3. StatisticExpert: MLP（统计特征专家，仅处理目标变量统计特征）
+3. DistributionShiftExpert: MLP（分布偏移专家，刻画窗口级非平稳分布变化）
 """
 
 import torch
@@ -221,7 +221,7 @@ class LongTermExpert(nn.Module):
         return output
 
 
-class StatisticExpert(nn.Module):
+class DistributionShiftExpert(nn.Module):
     """鲁棒分布偏移专家：MLP 处理窗口级分布变化特征"""
     def __init__(self, input_dim, n_targets=20, hidden_dim=128, output_dim=None, dropout=0.2,
                  enhanced_stats=True, feature_set='robust'):
@@ -242,7 +242,7 @@ class StatisticExpert(nn.Module):
             'robust': 10,     # quantile + robust_z, quantile_skew, volatility, peak-to-average
         }.get(self.feature_set)
         if stats_per_target is None:
-            raise ValueError(f"未知统计特征集合: {self.feature_set}")
+            raise ValueError(f"未知分布偏移特征集合: {self.feature_set}")
 
         target_stats_dim = n_targets * stats_per_target
         self.target_stats_proj = nn.Sequential(
@@ -312,6 +312,10 @@ class StatisticExpert(nn.Module):
             output = target_encoded
         
         return output
+
+
+# Backward-compatible alias for legacy scripts/checkpoints and old ablation names.
+StatisticExpert = DistributionShiftExpert
 
 
 class RegimeEncoder(nn.Module):
@@ -448,33 +452,33 @@ class MoENanjin(nn.Module):
             expert_types.append('ShortTerm')
             self.experts.append(LongTermExpert(input_dim, output_dim=output_dim, **expert_config['long_term'], dropout=dropout))
             expert_types.append('LongTerm')
-            self.experts.append(StatisticExpert(
+            self.experts.append(DistributionShiftExpert(
                 input_dim, n_targets=input_dim, output_dim=output_dim,
                 enhanced_stats=enhanced_statistic, feature_set=statistic_feature_set,
                 **expert_config['statistic'], dropout=dropout
             ))
             expert_types.append('DistributionShift')
         elif ablation_mode == 'no_statistic':
-            # 移除StatisticExpert：1×GRU + 1×Transformer = 2个专家
+            # 移除分布偏移专家：1×GRU + 1×Transformer = 2个专家
             self.experts.append(ShortTermExpert(input_dim, output_dim=output_dim, **expert_config['short_term'], dropout=dropout))
             expert_types.append('ShortTerm')
             self.experts.append(LongTermExpert(input_dim, output_dim=output_dim, **expert_config['long_term'], dropout=dropout))
             expert_types.append('LongTerm')
         elif ablation_mode == 'no_longterm':
-            # 移除LongTermExpert：1×GRU + 1×MLP = 2个专家
+            # 移除LongTermExpert：1×GRU + 1×分布偏移MLP = 2个专家
             self.experts.append(ShortTermExpert(input_dim, output_dim=output_dim, **expert_config['short_term'], dropout=dropout))
             expert_types.append('ShortTerm')
-            self.experts.append(StatisticExpert(
+            self.experts.append(DistributionShiftExpert(
                 input_dim, n_targets=input_dim, output_dim=output_dim,
                 enhanced_stats=enhanced_statistic, feature_set=statistic_feature_set,
                 **expert_config['statistic'], dropout=dropout
             ))
             expert_types.append('DistributionShift')
         elif ablation_mode == 'no_shortterm':
-            # 移除ShortTermExpert：1×Transformer + 1×MLP = 2个专家
+            # 移除ShortTermExpert：1×Transformer + 1×分布偏移MLP = 2个专家
             self.experts.append(LongTermExpert(input_dim, output_dim=output_dim, **expert_config['long_term'], dropout=dropout))
             expert_types.append('LongTerm')
-            self.experts.append(StatisticExpert(
+            self.experts.append(DistributionShiftExpert(
                 input_dim, n_targets=input_dim, output_dim=output_dim,
                 enhanced_stats=enhanced_statistic, feature_set=statistic_feature_set,
                 **expert_config['statistic'], dropout=dropout
@@ -495,7 +499,7 @@ class MoENanjin(nn.Module):
         print(f"\n[模型配置] 消融模式: {ablation_mode}")
         print(f"  专家数量: {self.num_experts}")
         print(f"  专家类型: {expert_types}")
-        print(f"  统计专家特征: {self.statistic_feature_set}")
+        print(f"  分布偏移专家特征: {self.statistic_feature_set}")
         print(f"  Regime-aware routing: {self.use_regime_routing}")
     
     def forward(self, x, scene_c=None):

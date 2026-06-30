@@ -1,6 +1,6 @@
-# MoE-Nanjin · 高铁客流多尺度预测
+# MoE-Nanjin · 场景条件化铁路客流非平稳分解-路由预测
 
-基于多专家融合（MoE）的南京南高铁客流预测项目。论文定稿见 `paper/`。
+基于 Regime-aware Mixture Routing（RAMR）的南京南站双向日粒度客流预测项目。当前论文叙事聚焦“趋势-周期-扰动”的非平稳分解归纳偏置，并通过场景/状态条件化路由将不同非平稳成分映射到短期依赖、长期依赖与分布偏移专家。
 
 ## 目录结构
 
@@ -11,7 +11,7 @@ moe_nanjin1/
 ├── src/                             # 核心 Python 代码
 ├── scripts/                         # 训练 / 评估 / 实验脚本
 ├── paper/                           # 论文与投稿材料
-│   ├── 基于多专家融合的高铁客流多尺度预测方法-北京交通大学学报-v2.docx
+│   ├── 2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx
 │   ├── figures/                     # 论文配图（PDF/PNG）
 │   ├── revision/                    # 退修对照、实验说明、创新点
 │   ├── submission/                  # 投稿附件（协议、无作者 PDF 等）
@@ -46,12 +46,12 @@ python3 src/plot_paper_figures.py \
 
 ## 模型权重
 
-**权重保存在 `/root/data/huangchanni/checkpoints/`，不在本仓库内。**
+**权重保存在 `/root/data3/huangchanni/moe/checkpoints/`，不在本仓库内。**
 
 | 实验 | 路径 | 说明 |
 |------|------|------|
-| 论文主模型 | `paper_experiments/demoe_full/` | DeMoE-Rail 完整版 |
-| 消融 | `paper_experiments/ablation_*` | 场景门控 / 均衡 / 统计专家 |
+| 论文主模型 | `paper_experiments/demoe_full/` | MoE-Rail/RAMR 完整版 |
+| 消融 | `paper_experiments/ablation_*` | 场景门控 / regime routing / 负载均衡 / 分布偏移专家 |
 | Baseline | `moe_nanjin/` | 完整三专家模型 |
 | 组件消融 | `moe_nanjin_no_{statistic,longterm,shortterm}/` | 2024-12 复现实验 |
 
@@ -59,7 +59,7 @@ python3 src/plot_paper_figures.py \
 
 ## 论文文件
 
-- **当前定稿**：`paper/基于多专家融合的高铁客流多尺度预测方法-北京交通大学学报-v2.docx`
+- **当前定稿**：`paper/2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx`
 - **退修对照**：`paper/revision/`
 - **排版工具**：`paper/tools/format_tiedao_submission.py`
 

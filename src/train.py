@@ -117,6 +117,7 @@ def compute_loss(y_pred, y_true, gate_logits, lambda_mape=0.0, lambda_mae=0.0, l
     expert_usage = gate_weights.mean(dim=0)
     if balance_mode == 'entropy':
         eps = 1e-8
+        # Minimizing sum(p log p) maximizes the batch-level expert usage entropy.
         balance_loss = (expert_usage * torch.log(expert_usage + eps)).sum()
     else:
         balance_loss = torch.var(expert_usage)
@@ -483,12 +484,12 @@ def main():
     parser.add_argument('--no_scene_gating', dest='use_scene_gating', action='store_false',
                         help='关闭场景门控（消融 Table 7）')
     parser.add_argument('--enhanced_statistic', action='store_true', default=True,
-                        help='增强残差专家统计特征（默认开启）')
+                        help='增强分布偏移专家特征（默认开启）')
     parser.add_argument('--no_enhanced_statistic', dest='enhanced_statistic', action='store_false',
                         help='关闭增强统计（消融 Table 6）')
     parser.add_argument('--statistic_feature_set', type=str, default='robust',
                         choices=['basic', 'quantile', 'robust'],
-                        help='统计专家特征集合: basic=mean/std/max, quantile=加入分位数, robust=加入鲁棒分布偏移特征')
+                        help='分布偏移专家特征集合: basic=mean/std/max, quantile=加入分位数, robust=加入鲁棒分布偏移特征')
     parser.add_argument('--use_regime_routing', action='store_true', default=True,
                         help='启用Regime-aware Mixture Routing（默认开启）')
     parser.add_argument('--no_regime_routing', dest='use_regime_routing', action='store_false',
@@ -496,7 +497,7 @@ def main():
     parser.add_argument('--regime_dim', type=int, default=16,
                         help='regime embedding维度')
     parser.add_argument('--balance_mode', type=str, default='entropy', choices=['entropy', 'variance'],
-                        help='负载均衡: entropy(熵正则) 或 variance(方差，旧版)')
+                        help='负载均衡: entropy=高熵专家使用约束, variance=平均权重方差约束')
     parser.add_argument('--snapshot_every', type=int, default=5,
                         help='每 N 个 epoch 保存测试集选模用快照（不删除，默认5）')
     parser.add_argument('--max_keep_models', type=int, default=30,

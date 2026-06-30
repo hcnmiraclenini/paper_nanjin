@@ -1,7 +1,7 @@
 #!/bin/bash
 # MoE-Nanjin 消融实验训练脚本
 # 运行3个消融实验：
-# 1. 移除StatisticExpert
+# 1. 移除分布偏移专家（旧消融名 no_statistic）
 # 2. 移除LongTermExpert
 # 3. 移除ShortTermExpert
 
@@ -32,7 +32,7 @@ echo "MoE-Nanjin 消融实验"
 echo "=========================================="
 echo ""
 echo "将运行以下3个消融实验："
-echo "  1. 移除StatisticExpert (no_statistic)"
+echo "  1. 移除分布偏移专家 (no_statistic)"
 echo "  2. 移除LongTermExpert (no_longterm)"
 echo "  3. 移除ShortTermExpert (no_shortterm)"
 echo ""
@@ -45,9 +45,9 @@ echo ""
 echo "=========================================="
 echo ""
 
-# 实验1：移除StatisticExpert
+# 实验1：移除分布偏移专家
 echo "=========================================="
-echo "[实验1/3] 移除StatisticExpert"
+echo "[实验1/3] 移除分布偏移专家"
 echo "=========================================="
 python3 src/train.py $BASE_CONFIG \
     --ablation_mode no_statistic \

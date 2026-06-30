@@ -7,18 +7,18 @@
 运行所有消融实验
 ----------------
 
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 bash train_ablation.sh
 
 这将依次运行3个消融实验：
-1. 移除StatisticExpert (no_statistic)
+1. 移除DistributionShiftExpert (no_statistic)
 2. 移除LongTermExpert (no_longterm)  
 3. 移除ShortTermExpert (no_shortterm)
 
 单独运行某个消融实验
 --------------------
 
-# 移除StatisticExpert
+# 移除DistributionShiftExpert
 python train.py --ablation_mode no_statistic --save_dir ../checkpoints/moe_nanjin_no_statistic
 
 # 移除LongTermExpert
@@ -32,25 +32,25 @@ python train.py --ablation_mode no_shortterm --save_dir ../checkpoints/moe_nanji
 
 基线模型（baseline）
 --------------------
-- 专家配置：1×ShortTermExpert (GRU) + 1×LongTermExpert (Transformer) + 1×StatisticExpert (MLP)
+- 专家配置：1×ShortTermExpert (GRU) + 1×LongTermExpert (Transformer) + 1×DistributionShiftExpert (MLP)
 - 专家总数：3个
 - 预期MAPE：~20%（与原始实验一致）
 
-实验1：移除StatisticExpert (no_statistic)
+实验1：移除DistributionShiftExpert (no_statistic)
 ------------------------------------------
 - 专家配置：1×ShortTermExpert (GRU) + 1×LongTermExpert (Transformer)
 - 专家总数：2个
-- 目的：验证统计特征专家的贡献
+- 目的：验证分布偏移专家的贡献
 
 实验2：移除LongTermExpert (no_longterm)
 ----------------------------------------
-- 专家配置：1×ShortTermExpert (GRU) + 1×StatisticExpert (MLP)
+- 专家配置：1×ShortTermExpert (GRU) + 1×DistributionShiftExpert (MLP)
 - 专家总数：2个
 - 目的：验证长期依赖专家的贡献
 
 实验3：移除ShortTermExpert (no_shortterm)
 ------------------------------------------
-- 专家配置：1×LongTermExpert (Transformer) + 1×StatisticExpert (MLP)
+- 专家配置：1×LongTermExpert (Transformer) + 1×DistributionShiftExpert (MLP)
 - 专家总数：2个
 - 目的：验证短期依赖专家的贡献
 
@@ -78,7 +78,7 @@ python train.py --ablation_mode no_shortterm --save_dir ../checkpoints/moe_nanji
 ------------
 
 - 基线模型：../checkpoints/moe_nanjin/
-- 移除StatisticExpert：../checkpoints/moe_nanjin_no_statistic/
+- 移除DistributionShiftExpert：../checkpoints/moe_nanjin_no_statistic/
 - 移除LongTermExpert：../checkpoints/moe_nanjin_no_longterm/
 - 移除ShortTermExpert：../checkpoints/moe_nanjin_no_shortterm/
 

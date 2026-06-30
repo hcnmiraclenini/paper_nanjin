@@ -89,7 +89,7 @@ def main():
         
         f.write("实验配置：\n")
         f.write("-" * 80 + "\n")
-        f.write("模型：基线模型（3个专家：ShortTerm + LongTerm + Statistic）\n")
+        f.write("模型：基线模型（3个专家：ShortTerm + LongTerm + DistributionShift）\n")
         f.write("其他配置：与基线模型完全一致（horizon=1, hidden_dim=512, dropout=0.15等）\n")
         f.write("测试的Lookback值：6, 7, 10, 14, 30\n")
         f.write("\n")
@@ -193,4 +193,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

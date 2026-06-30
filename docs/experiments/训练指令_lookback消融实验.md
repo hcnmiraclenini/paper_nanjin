@@ -11,7 +11,7 @@
 ### Lookback = 6
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 python3 train.py \
     --data_dir ../data \
@@ -38,7 +38,7 @@ python3 train.py \
 ### Lookback = 7
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 python3 train.py \
     --data_dir ../data \
@@ -65,7 +65,7 @@ python3 train.py \
 ### Lookback = 10
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 python3 train.py \
     --data_dir ../data \
@@ -92,7 +92,7 @@ python3 train.py \
 ### Lookback = 14
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 python3 train.py \
     --data_dir ../data \
@@ -119,7 +119,7 @@ python3 train.py \
 ### Lookback = 30
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 python3 train.py \
     --data_dir ../data \
@@ -148,7 +148,7 @@ python3 train.py \
 训练完成后，评估每个模型：
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 # 创建结果目录
 mkdir -p ../results/moe_nanjin_lookback_ablation
@@ -169,7 +169,7 @@ done
 ## 📈 汇总结果
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 python3 summarize_lookback_results.py
 ```
 

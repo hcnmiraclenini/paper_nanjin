@@ -10,7 +10,7 @@
 - 6, 7, 10, 14, 30
 
 ### 实验配置
-- **模型**：基线模型（3个专家：ShortTerm + LongTerm + Statistic）
+- **模型**：基线模型（3个专家：ShortTerm + LongTerm + DistributionShift）
 - **其他配置**：与基线模型完全一致
 - **注意**：lookback=30需要更多历史数据，训练样本数会相应减少
   - horizon = 1
@@ -33,7 +33,7 @@
 ### 方法1：运行完整实验脚本（推荐）
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 bash train_lookback_ablation.sh
 ```
 
@@ -42,7 +42,7 @@ bash train_lookback_ablation.sh
 ### 方法2：单独运行某个lookback值
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 
 # 例如：训练lookback=5的模型
 python train.py \
@@ -80,7 +80,7 @@ python evaluate.py \
 实验完成后，运行汇总脚本：
 
 ```bash
-cd /root/data/huangchanni/moe_nanjin1
+cd /root/data3/huangchanni/moe/moe_nanjin1
 python summarize_lookback_results.py
 ```
 

@@ -3,19 +3,19 @@
 **权重文件不在本仓库目录内**，统一保存在上级目录：
 
 ```
-/root/data/huangchanni/checkpoints/
+/root/data3/huangchanni/moe/checkpoints/
 ```
 
-本仓库根目录有符号链接 `checkpoints -> ../checkpoints`，便于访问。
+训练和评估脚本默认通过相对路径 `../checkpoints` 访问该目录。
 
 ## 论文核心实验（必保留）
 
 | 目录 | 用途 | 主模型文件 |
 |------|------|-----------|
-| `paper_experiments/demoe_full` | **DeMoE-Rail 完整版**（场景门控+增强统计+熵均衡） | `best_model_latest.pth` |
+| `paper_experiments/demoe_full` | **MoE-Rail/RAMR 完整版**（场景门控+regime routing+分布偏移专家+高熵负载均衡） | `best_model_latest.pth` |
 | `paper_experiments/ablation_no_scene` | 消融：无场景门控 | `best_model_latest.pth` |
 | `paper_experiments/ablation_variance_balance` | 消融：方差均衡 | `best_model_latest.pth` |
-| `paper_experiments/ablation_no_enhanced_stat` | 消融：无增强统计专家 | `best_model_latest.pth` |
+| `paper_experiments/ablation_no_enhanced_stat` | 消融：仅使用基础分布统计特征 | `best_model_latest.pth` |
 | `paper_experiments/baseline_repro` | 复现旧版三专家 baseline | `best_model_latest.pth` |
 
 配置：`lookback=6`, `horizon=1`, `n_targets=20`（20 变量单步预测）。
@@ -25,7 +25,7 @@
 | 目录 | 用途 |
 |------|------|
 | `moe_nanjin` | 完整模型 baseline |
-| `moe_nanjin_no_statistic` | 移除 StatisticExpert |
+| `moe_nanjin_no_statistic` | 移除分布偏移专家（旧目录名保留 no_statistic） |
 | `moe_nanjin_no_longterm` | 移除 LongTermExpert |
 | `moe_nanjin_no_shortterm` | 移除 ShortTermExpert |
 | `moe_nanjin_baseline_original` | 原文 baseline 复现 |

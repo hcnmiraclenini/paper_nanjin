@@ -47,12 +47,12 @@ run_train "ablation_no_scene" 2 \
     --no_scene_gating --use_regime_routing --enhanced_statistic \
     --statistic_feature_set robust --balance_mode entropy
 
-# GPU3: 统计专家仅 mean/std/max
+# GPU3: 分布偏移专家仅 mean/std/max
 run_train "ablation_stat_basic" 3 \
     --use_scene_gating --use_regime_routing --no_enhanced_statistic \
     --statistic_feature_set basic --balance_mode entropy
 
-# GPU4: 统计专家加入分位数
+# GPU4: 分布偏移专家加入分位数
 run_train "ablation_stat_quantile" 4 \
     --use_scene_gating --use_regime_routing --enhanced_statistic \
     --statistic_feature_set quantile --balance_mode entropy
