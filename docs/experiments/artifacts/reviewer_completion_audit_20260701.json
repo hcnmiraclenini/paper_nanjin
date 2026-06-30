@@ -1,0 +1,264 @@
+{
+  "passed": true,
+  "protocol": "Read-only reviewer completion audit. Checks evidence files and text coverage for all 15 reviewer comments; performs no training, tuning, checkpoint selection, or test-set evaluation.",
+  "n_items": 15,
+  "passed_items": 15,
+  "rows": [
+    {
+      "id": "R1-1",
+      "comment": "统计特征能否解释突发事件、极端天气",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/固定消融套件复核_20260701.md",
+        "docs/experiments/高需求高波动压力场景审计_20260701.md",
+        "docs/experiments/artifacts/event_stress_baseline_audit_20260701.json"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx",
+        "response_docx"
+      ]
+    },
+    {
+      "id": "R1-2",
+      "comment": "数据集介绍增加表格",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "paper/论文终稿.md",
+        "paper/2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R1-3",
+      "comment": "补充特征工程及特征选择",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/artifacts/fixed_ablation_metrics_20260701.json"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R1-4",
+      "comment": "短期专家权重低解释",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/Regime门控对齐审计_20260701.md",
+        "docs/experiments/场景分层现代强基线审计_20260701.md",
+        "docs/experiments/artifacts/regime_gate_alignment_audit_20260701.json",
+        "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.json"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx",
+        "response_docx"
+      ]
+    },
+    {
+      "id": "R1-5",
+      "comment": "Traffic 跨粒度泛化跨度大",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/Traffic跨粒度证据边界_20260701.md",
+        "docs/experiments/Traffic跨粒度边界自动审计_20260701.md",
+        "docs/experiments/artifacts/traffic_boundary_audit_20260701.json"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx",
+        "response_docx"
+      ]
+    },
+    {
+      "id": "R1-6",
+      "comment": "摘要不要出现公式",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "paper/论文终稿.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R1-7",
+      "comment": "VAR 表现差，补充/更换对比方法",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/artifacts/modern_baselines_correct_data_20260701.json"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R1-8",
+      "comment": "英文字体不统一",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/Word格式与表格一致性审计_20260701.md"
+      ],
+      "text_scope": [
+        "response_md",
+        "expert_response_md",
+        "completion_md"
+      ]
+    },
+    {
+      "id": "R1-9",
+      "comment": "图4第一张图不清晰",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/Word格式与表格一致性审计_20260701.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R1-10",
+      "comment": "St/Tt/Rt 下标问题",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "paper/论文终稿.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R2-1",
+      "comment": "创新性不足，像模块组合",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "paper/论文终稿.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R2-2",
+      "comment": "补充 PatchTST/TimeMixer/iTransformer/FreEformer",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/现代强基线配对预测审计_20260701.md",
+        "docs/experiments/现代强基线配对显著性审计_20260701.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R2-3",
+      "comment": "MSE好但MAE一般，跨域结论不充分",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/artifacts/strict_ramr_ve_fixed_ensemble_summary_20260701.json",
+        "docs/experiments/现代强基线全指标支配审计_20260701.md",
+        "docs/experiments/现代强基线配对显著性审计_20260701.md",
+        "docs/experiments/站点方向误差剖面审计_20260701.md",
+        "docs/experiments/流量分层误差审计_20260701.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R2-4",
+      "comment": "增加日历特征、负载均衡消融",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "docs/experiments/固定消融套件复核_20260701.md",
+        "docs/experiments/artifacts/fixed_ablation_metrics_20260701.json"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    },
+    {
+      "id": "R2-5",
+      "comment": "日粒度表述和熵正则不清晰",
+      "passed": true,
+      "missing_files": [],
+      "missing_keyword_groups": [],
+      "evidence_files": [
+        "paper/论文终稿.md"
+      ],
+      "text_scope": [
+        "paper_md",
+        "response_md",
+        "expert_response_md",
+        "paper_docx"
+      ]
+    }
+  ]
+}

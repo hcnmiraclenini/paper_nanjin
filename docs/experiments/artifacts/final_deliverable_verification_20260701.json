@@ -252,6 +252,14 @@
       }
     },
     {
+      "name": "reviewer_completion_audit",
+      "passed": true,
+      "detail": {
+        "passed_items": 15,
+        "n_items": 15
+      }
+    },
+    {
       "name": "text_claim_consistency_audit",
       "passed": true,
       "detail": {

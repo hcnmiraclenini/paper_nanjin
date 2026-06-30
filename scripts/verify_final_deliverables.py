@@ -54,6 +54,7 @@ REQUIRED_FILES = [
     "专家意见逐条修改说明.md",
     "docs/experiments/最终一致性核验_20260701.md",
     "docs/experiments/审稿意见完成度审计_20260701.md",
+    "docs/experiments/审稿意见完成度自动审计_20260701.md",
     "docs/experiments/无泄露实验协议审计_20260701.md",
     "docs/experiments/固定消融套件复核_20260701.md",
     "docs/experiments/现代强基线优势边界审计_20260701.md",
@@ -86,6 +87,7 @@ REQUIRED_FILES = [
     "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.csv",
     "docs/experiments/artifacts/scene_baseline_stratification_audit_20260701.json",
     "docs/experiments/artifacts/traffic_boundary_audit_20260701.json",
+    "docs/experiments/artifacts/reviewer_completion_audit_20260701.json",
     "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
@@ -522,6 +524,27 @@ def main() -> int:
         },
     )
 
+    reviewer_completion = json.loads(
+        (ROOT / "docs/experiments/artifacts/reviewer_completion_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    reviewer_completion_ok = (
+        reviewer_completion["passed"] is True
+        and reviewer_completion["n_items"] == 15
+        and reviewer_completion["passed_items"] == 15
+        and all(row["passed"] for row in reviewer_completion["rows"])
+    )
+    add_check(
+        checks,
+        "reviewer_completion_audit",
+        reviewer_completion_ok,
+        {
+            "passed_items": reviewer_completion["passed_items"],
+            "n_items": reviewer_completion["n_items"],
+        },
+    )
+
     text_claim = json.loads(
         (ROOT / "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json").read_text(
             encoding="utf-8"
@@ -643,6 +666,7 @@ def main() -> int:
         ROOT / "专家意见逐条修改说明.md",
         ROOT / "docs/experiments/最终一致性核验_20260701.md",
         ROOT / "docs/experiments/审稿意见完成度审计_20260701.md",
+        ROOT / "docs/experiments/审稿意见完成度自动审计_20260701.md",
         ROOT / "docs/experiments/无泄露实验协议审计_20260701.md",
         ROOT / "docs/experiments/现代强基线优势边界审计_20260701.md",
         ROOT / "docs/experiments/现代强基线全指标支配审计_20260701.md",
@@ -663,6 +687,7 @@ def main() -> int:
         "paper/2026-0268-基于多专家融合的铁路客流多尺度预测方法.docx",
         "paper/论文终稿.docx",
         "审稿意见逐条回复稿.md",
+        "审稿意见完成度自动审计_20260701.md",
         "18.5463",
         "0.035640",
         "0.138028",
@@ -717,6 +742,7 @@ def main() -> int:
             "- 高需求高波动压力场景审计显示高需求日三指标均优于现代强基线，并披露高日际变化日 MSE/MAE 的 TimeMixer 边界。",
             "- 场景分层现代强基线审计显示工作日和周末两类场景下 Strict RAMR-VE 三项指标均优于现代强基线，并披露当前测试窗口无节假日样本。",
             "- Traffic 跨粒度边界自动审计确认当前仓库无可端到端复现的 Traffic 原始数据，并拦截过强跨域泛化表述。",
+            "- 审稿意见完成度自动审计显示两位专家共 15 条意见均已有证据文件和论文/回复文字闭环。",
             "- 论文数值与口径一致性审计确认论文、审稿回复、逐条说明和 Word 稿中的关键数字与实验边界均已对齐权威 artifact。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",
