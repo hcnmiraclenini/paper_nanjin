@@ -118,6 +118,7 @@ def main() -> int:
     no_leak = read_json(ARTIFACT_DIR / "no_leakage_protocol_audit_20260701.json")
     dominance = read_json(ARTIFACT_DIR / "modern_baseline_dominance_audit_20260701.json")
     paired = read_json(ARTIFACT_DIR / "modern_baseline_paired_audit_20260701.json")
+    paired_sig = read_json(ARTIFACT_DIR / "paired_significance_audit_20260701.json")
     target_profile = read_json(ARTIFACT_DIR / "target_error_profile_20260701.json")
     flow = read_json(ARTIFACT_DIR / "flow_stratified_error_audit_20260701.json")
     regime = read_json(ARTIFACT_DIR / "regime_gate_alignment_audit_20260701.json")
@@ -201,6 +202,32 @@ def main() -> int:
         },
     )
 
+    paired_sig_summary = paired_sig["summary"]
+    paired_sig_ok = (
+        paired_sig["passed"] is True
+        and paired_sig["n_dates"] == 212
+        and paired_sig["n_targets"] == 20
+        and paired_sig_summary["point_margin_positive_cells"] == 15
+        and paired_sig_summary["total_cells"] == 15
+        and paired_sig_summary["wilcoxon_holm_significant_0_01_cells"] == 15
+        and paired_sig_summary["bootstrap_ci95_low_positive_cells"] == 14
+        and paired_sig_summary["sign_flip_holm_significant_0_01_cells"] == 14
+        and paired_sig_summary["closest_bootstrap_ci_cell"]["baseline"] == "TimeMixer"
+        and paired_sig_summary["closest_bootstrap_ci_cell"]["metric"] == "MSE"
+    )
+    add_check(
+        checks,
+        "authoritative_paired_significance_artifact_loaded",
+        paired_sig_ok,
+        {
+            "point_margin_positive_cells": paired_sig_summary["point_margin_positive_cells"],
+            "wilcoxon_holm_significant_0_01_cells": paired_sig_summary["wilcoxon_holm_significant_0_01_cells"],
+            "bootstrap_ci95_low_positive_cells": paired_sig_summary["bootstrap_ci95_low_positive_cells"],
+            "sign_flip_holm_significant_0_01_cells": paired_sig_summary["sign_flip_holm_significant_0_01_cells"],
+            "closest_boundary": paired_sig_summary["closest_bootstrap_ci_cell"],
+        },
+    )
+
     core_metric_needles = ["18.5463", "0.035640", "0.138028"]
     core_docs = ["readme", "paper_md", "response_md", "expert_response_md", "final_consistency_md", "paper_docx"]
     metric_missing = {
@@ -233,6 +260,20 @@ def main() -> int:
     }
     paired_missing = {name: miss for name, miss in paired_missing.items() if miss}
     add_check(checks, "paired_modern_baseline_claims_written_in_texts", not paired_missing, paired_missing)
+
+    paired_sig_groups = [
+        ("Wilcoxon-Holm", ["Wilcoxon-Holm"]),
+        ("15/15", ["15/15"]),
+        ("14/15", ["14/15"]),
+        ("TimeMixer", ["TimeMixer"]),
+        ("MSE", ["MSE"]),
+    ]
+    paired_sig_docs = ["readme", "paper_md", "response_md", "expert_response_md", "final_consistency_md", "paper_docx", "response_docx"]
+    paired_sig_missing = {
+        name: missing_groups(texts[name], paired_sig_groups) for name in paired_sig_docs
+    }
+    paired_sig_missing = {name: miss for name, miss in paired_sig_missing.items() if miss}
+    add_check(checks, "paired_significance_claims_written_in_texts", not paired_sig_missing, paired_sig_missing)
 
     boundary_groups = [
         ("结构鲁棒", ["结构鲁棒"]),
@@ -325,6 +366,7 @@ def main() -> int:
         f"- 数据与协议：846 个共同日期、20 个目标变量、423/211/212 天时间顺序划分，RobustScaler 仅在训练集拟合。",
         f"- 现代强基线点估计支配：{dominance['point_dominance_cells']}/{dominance['point_dominance_total_cells']} 个 MAPE/MSE/MAE 比较单元更低。",
         f"- 现代强基线配对预测审计：{paired['summary']['point_dominance_cells']}/{paired['summary']['point_dominance_total_cells']} 个点估计比较单元更低，三指标同时更优的日期级 bootstrap 概率最低为 {paired['summary']['min_all_three_prob'] * 100:.2f}%，最接近边界为 {paired['summary']['closest_by_all_three_prob']}。",
+        f"- 现代强基线配对统计审计：{paired_sig_summary['wilcoxon_holm_significant_0_01_cells']}/{paired_sig_summary['total_cells']} 个 Wilcoxon-Holm 单侧检验在 α=0.01 下显著，bootstrap/符号置换边界单元为 TimeMixer-MSE。",
         "",
         "## 检查结果",
         "",
@@ -346,7 +388,7 @@ def main() -> int:
             "",
             "## 结论",
             "",
-            "- 论文正文、审稿回复、逐条修改说明、最终一致性核验和 Word 稿均已写入最终三指标、无泄露协议、现代强基线全指标支配和配对预测审计证据。",
+            "- 论文正文、审稿回复、逐条修改说明、最终一致性核验和 Word 稿均已写入最终三指标、无泄露协议、现代强基线全指标支配、配对预测审计和配对统计审计证据。",
             "- 文稿保留了必要边界：Traffic 只作为重构小时级窗口和周期特征后的结构鲁棒性初步验证，不作为稳定跨域泛化证明；配对预测审计作为补充证据，不替换原现代强基线主表。",
             "- 当前结论限定在南京南站双向日粒度客流、当前时间顺序划分和当前对比模型集合下。",
         ]

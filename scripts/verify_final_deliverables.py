@@ -59,6 +59,7 @@ REQUIRED_FILES = [
     "docs/experiments/现代强基线优势边界审计_20260701.md",
     "docs/experiments/现代强基线全指标支配审计_20260701.md",
     "docs/experiments/现代强基线配对预测审计_20260701.md",
+    "docs/experiments/现代强基线配对显著性审计_20260701.md",
     "docs/experiments/论文数值与口径一致性审计_20260701.md",
     "docs/experiments/站点方向误差剖面审计_20260701.md",
     "docs/experiments/流量分层误差审计_20260701.md",
@@ -75,6 +76,8 @@ REQUIRED_FILES = [
     "docs/experiments/figures/modern_baseline_all_metrics_20260701.png",
     "docs/experiments/artifacts/modern_baseline_paired_audit_20260701.csv",
     "docs/experiments/artifacts/modern_baseline_paired_audit_20260701.json",
+    "docs/experiments/artifacts/paired_significance_audit_20260701.csv",
+    "docs/experiments/artifacts/paired_significance_audit_20260701.json",
     "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/DLinear_test_predictions.npz",
     "docs/experiments/artifacts/modern_baseline_paired_predictions_20260701/PatchTST_test_predictions.npz",
@@ -398,6 +401,37 @@ def main() -> int:
         },
     )
 
+    paired_sig = json.loads(
+        (ROOT / "docs/experiments/artifacts/paired_significance_audit_20260701.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    paired_sig_summary = paired_sig["summary"]
+    paired_sig_ok = (
+        paired_sig["passed"] is True
+        and paired_sig["n_dates"] == 212
+        and paired_sig["n_targets"] == 20
+        and paired_sig_summary["point_margin_positive_cells"] == 15
+        and paired_sig_summary["total_cells"] == 15
+        and paired_sig_summary["wilcoxon_holm_significant_0_01_cells"] == 15
+        and paired_sig_summary["bootstrap_ci95_low_positive_cells"] == 14
+        and paired_sig_summary["sign_flip_holm_significant_0_01_cells"] == 14
+        and paired_sig_summary["closest_bootstrap_ci_cell"]["baseline"] == "TimeMixer"
+        and paired_sig_summary["closest_bootstrap_ci_cell"]["metric"] == "MSE"
+    )
+    add_check(
+        checks,
+        "paired_significance_audit",
+        paired_sig_ok,
+        {
+            "point_margin_positive_cells": paired_sig_summary["point_margin_positive_cells"],
+            "wilcoxon_holm_significant_0_01_cells": paired_sig_summary["wilcoxon_holm_significant_0_01_cells"],
+            "bootstrap_ci95_low_positive_cells": paired_sig_summary["bootstrap_ci95_low_positive_cells"],
+            "sign_flip_holm_significant_0_01_cells": paired_sig_summary["sign_flip_holm_significant_0_01_cells"],
+            "closest_boundary": paired_sig_summary["closest_bootstrap_ci_cell"],
+        },
+    )
+
     text_claim = json.loads(
         (ROOT / "docs/experiments/artifacts/text_claim_consistency_audit_20260701.json").read_text(
             encoding="utf-8"
@@ -544,6 +578,7 @@ def main() -> int:
         "现代强基线优势边界审计_20260701.md",
         "现代强基线全指标支配审计_20260701.md",
         "现代强基线配对预测审计_20260701.md",
+        "现代强基线配对显著性审计_20260701.md",
         "论文数值与口径一致性审计_20260701.md",
         "站点方向误差剖面审计_20260701.md",
         "流量分层误差审计_20260701.md",
@@ -581,6 +616,7 @@ def main() -> int:
             "- 现代强基线优势边界审计显示相对 FreEformer 的三指标点估计均改善，bootstrap 三项同时更优比例不低于 80%。",
             "- 现代强基线全指标支配审计显示 15/15 个 MAPE/MSE/MAE 点估计比较单元均优于现代基线。",
             "- 现代强基线配对预测审计显示同一测试日期与目标变量下 15/15 个点估计比较单元均优，三指标同时更优的 bootstrap 概率最低为 89.40%。",
+            "- 现代强基线配对统计审计显示 15/15 个 Wilcoxon-Holm 单侧检验显著，并披露 TimeMixer-MSE 是 bootstrap/符号置换边界单元。",
             "- 论文数值与口径一致性审计确认论文、审稿回复、逐条说明和 Word 稿中的关键数字与实验边界均已对齐权威 artifact。",
             "- 站点方向误差剖面审计显示双向方向聚合 MAPE 均低于 20%，并披露低流量方向相对误差局限。",
             "- 流量分层误差审计显示高单点客流样本 MAPE 低于 15%，并披露高需求日期误差仍高于常规需求日期。",

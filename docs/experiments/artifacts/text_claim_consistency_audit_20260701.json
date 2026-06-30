@@ -66,6 +66,21 @@
       }
     },
     {
+      "name": "authoritative_paired_significance_artifact_loaded",
+      "passed": true,
+      "detail": {
+        "point_margin_positive_cells": 15,
+        "wilcoxon_holm_significant_0_01_cells": 15,
+        "bootstrap_ci95_low_positive_cells": 14,
+        "sign_flip_holm_significant_0_01_cells": 14,
+        "closest_boundary": {
+          "baseline": "TimeMixer",
+          "metric": "MSE",
+          "bootstrap_ci95_low": -0.0018087808868011
+        }
+      }
+    },
+    {
       "name": "final_metrics_written_in_core_texts",
       "passed": true,
       "detail": {}
@@ -77,6 +92,11 @@
     },
     {
       "name": "paired_modern_baseline_claims_written_in_texts",
+      "passed": true,
+      "detail": {}
+    },
+    {
+      "name": "paired_significance_claims_written_in_texts",
       "passed": true,
       "detail": {}
     },
